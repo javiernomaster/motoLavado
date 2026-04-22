@@ -22,7 +22,7 @@ class TrabajadorController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:100',
-            'ci' => 'required|unique:trabajador s,ci',
+            'ci' => 'required|unique:trabajadores,ci',
             'telefono' => 'nullable|string|max:20',
             'direccion' => 'nullable|string',
             'porcentaje_comision' => 'required|numeric|min:1|max:100',
@@ -50,7 +50,7 @@ class TrabajadorController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:100',
-            'ci' => 'required',
+            'ci' => 'required|unique:trabajadores,ci,' . $trabajador->id,
             'telefono' => 'nullable|string|max:20',
             'direccion' => 'nullable|string',
             'porcentaje_comision' => 'required|numeric|min:1|max:100',
@@ -72,7 +72,6 @@ class TrabajadorController extends Controller
     public function destroy(Trabajador $trabajador)
     {
         $trabajador->delete();
-
         return redirect()->route('trabajadores.index');
     }
 }

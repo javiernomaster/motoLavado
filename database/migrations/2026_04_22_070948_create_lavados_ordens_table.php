@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
             $table->foreignId('moto_id')->constrained('motos')->onDelete('cascade');
             $table->foreignId('servicio_id')->constrained('servicios')->onDelete('cascade');
-            $table->foreignId('trabajador_id')->constrained('trabajadors')->onDelete('cascade');
+            $table->foreignId('trabajador_id')->constrained('trabajadores')->onDelete('cascade');
 
             $table->decimal('precio_total', 10, 2)->nullable();
 

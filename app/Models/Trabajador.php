@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Trabajador extends Model
 {
-    protected $table = 'trabajadors';
+    protected $table = 'trabajadores';
 
     protected $fillable = [
-    'nombre',
-    'ci',
-    'telefono',
-    'direccion',
-    'porcentaje_comision',
-    'estado'
-];
+        'nombre',
+        'ci',
+        'telefono',
+        'direccion',
+        'porcentaje_comision',
+        'estado'
+    ];
 }
