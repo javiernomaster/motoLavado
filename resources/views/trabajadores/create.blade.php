@@ -2,9 +2,9 @@
 
 @section('content')
 <div class="container">
-    <h2>Registrar Servicio</h2>
+    <h2>Registrar Trabajador</h2>
 
-    <form action="{{ route('servicios.store') }}" method="POST">
+    <form action="{{ route('trabajadores.store') }}" method="POST">
         @csrf
 
         <div class="mb-3">
@@ -13,13 +13,23 @@
         </div>
 
         <div class="mb-3">
-            <label>Precio (Bs)</label>
-            <input type="number" name="precio" step="0.01" class="form-control" required>
+            <label>CI</label>
+            <input type="text" name="ci" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label>Descripción</label>
-            <textarea name="descripcion" class="form-control"></textarea>
+            <label>Teléfono</label>
+            <input type="text" name="telefono" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label>Dirección</label>
+            <input type="text" name="direccion" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label>Porcentaje de Comisión (%)</label>
+            <input type="number" name="porcentaje_comision" min="1" max="100" class="form-control" required>
         </div>
 
         <div class="mb-3">
@@ -31,6 +41,7 @@
         </div>
 
         <button class="btn btn-success">Guardar</button>
+        <a href="{{ route('trabajadores.index') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 @endsection
