@@ -8,8 +8,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('clientes', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // 👈 id estándar Laravel
             $table->string('nombre');
+            $table->string('ci')->unique();
             $table->string('telefono')->nullable();
             $table->string('direccion')->nullable();
             $table->timestamps();

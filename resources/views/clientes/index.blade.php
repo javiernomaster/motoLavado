@@ -14,23 +14,34 @@
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
+                <th>CI</th>
                 <th>Teléfono</th>
                 <th>Dirección</th>
+                <th>Acciones</th>
             </tr>
         </thead>
+
         <tbody>
             @forelse($clientes as $c)
             <tr>
-                <td>{{ $c->id_cliente }}</td>
+                <td>{{ $c->id }}</td>
                 <td>{{ $c->nombre }}</td>
+                <td>{{ $c->ci }}</td>
                 <td>{{ $c->telefono }}</td>
                 <td>{{ $c->direccion }}</td>
+                <td>
+                    <a href="{{ route('clientes.edit', $c->id) }}" class="btn btn-warning btn-sm">Editar</a>
+
+                    <form action="{{ route('clientes.destroy', $c->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
             </tr>
             @empty
             <tr>
-                <td colspan="4" class="text-center">
-                    No hay clientes registrados
-                </td>
+                <td colspan="6" class="text-center">No hay clientes registrados</td>
             </tr>
             @endforelse
         </tbody>

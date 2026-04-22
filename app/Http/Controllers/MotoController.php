@@ -8,47 +8,63 @@ use Illuminate\Http\Request;
 
 class MotoController extends Controller
 {
-    // LISTAR
     public function index()
     {
         $motos = Moto::with('cliente')->get();
         return view('motos.index', compact('motos'));
     }
 
-    // FORMULARIO
     public function create()
     {
         $clientes = Cliente::all();
         return view('motos.create', compact('clientes'));
     }
 
-    // GUARDAR
     public function store(Request $request)
     {
-        Moto::create($request->all());
+        $request->validate([
+            'placa' => 'required|string|max:10|unique:motos,placa',
+            'marca' => 'required|string|max:50',
+            'modelo' => 'required|string|max:50',
+            'cliente_id' => 'required|exists:clientes,id'
+        ]);
+
+        Moto::create([
+            'placa' => $request->placa,
+            'marca' => $request->marca,
+            'modelo' => $request->modelo,
+            'cliente_id' => $request->cliente_id,
+        ]);
+
         return redirect()->route('motos.index');
     }
 
-    // EDITAR
-    public function edit($placa)
+    public function edit(Moto $moto)
     {
-        $moto = Moto::findOrFail($placa);
         $clientes = Cliente::all();
-        return view('motos.edit', compact('moto','clientes'));
+        return view('motos.edit', compact('moto', 'clientes'));
     }
 
-    // ACTUALIZAR
-    public function update(Request $request, $placa)
+    public function update(Request $request, Moto $moto)
     {
-        $moto = Moto::findOrFail($placa);
-        $moto->update($request->all());
+        $request->validate([
+            'marca' => 'required|string|max:50',
+            'modelo' => 'required|string|max:50',
+            'cliente_id' => 'required|exists:clientes,id'
+        ]);
+
+        $moto->update([
+            'marca' => $request->marca,
+            'modelo' => $request->modelo,
+            'cliente_id' => $request->cliente_id,
+        ]);
+
         return redirect()->route('motos.index');
     }
 
-    // ELIMINAR
-    public function destroy($placa)
+    public function destroy(Moto $moto)
     {
-        Moto::destroy($placa);
-        return back();
+        $moto->delete();
+        return redirect()->route('motos.index');
     }
 }

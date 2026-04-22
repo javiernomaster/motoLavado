@@ -13,8 +13,8 @@ return new class extends Migration {
             $table->string('ci')->unique();
             $table->string('telefono')->nullable();
             $table->string('direccion')->nullable();
-            $table->decimal('salario', 10, 2)->nullable();
-            $table->boolean('estado')->default(1);
+           $table->decimal('porcentaje_comision', 5, 2)->default(40);
+            $table->string('estado')->default('activo'); // activo/inactivo
             $table->timestamps();
         });
     }

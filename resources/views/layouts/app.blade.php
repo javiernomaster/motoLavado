@@ -88,7 +88,7 @@
         <i class="bi bi-people"></i> Clientes
     </a>
 
-    <a href="{{ route('trabajadors.index') }}">
+    <a href="{{ route('trabajadores.index') }}">
         <i class="bi bi-person-badge"></i> Trabajadores
     </a>
 

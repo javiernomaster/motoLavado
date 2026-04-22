@@ -22,10 +22,15 @@ class ClienteController extends Controller
     {
         $request->validate([
             'nombre' => 'required',
-            'ci' => 'required|unique:clientes',
+            'ci' => 'required|unique:clientes,ci',
         ]);
 
-        Cliente::create($request->all());
+        Cliente::create([
+            'nombre' => $request->nombre,
+            'ci' => $request->ci,
+            'telefono' => $request->telefono,
+            'direccion' => $request->direccion,
+        ]);
 
         return redirect()->route('clientes.index');
     }
@@ -37,7 +42,17 @@ class ClienteController extends Controller
 
     public function update(Request $request, Cliente $cliente)
     {
-        $cliente->update($request->all());
+        $request->validate([
+            'nombre' => 'required',
+            'ci' => 'required|unique:clientes,ci,' . $cliente->id,
+        ]);
+
+        $cliente->update([
+            'nombre' => $request->nombre,
+            'ci' => $request->ci,
+            'telefono' => $request->telefono,
+            'direccion' => $request->direccion,
+        ]);
 
         return redirect()->route('clientes.index');
     }

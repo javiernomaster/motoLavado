@@ -4,43 +4,32 @@
 
 <h3>Nueva Moto</h3>
 
-<form action="{{ route('motos.store') }}" method="POST">
-    @csrf
+@if($errors->any())
+<div class="alert alert-danger">
+    <ul>
+        @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
 
-    <div class="mb-2">
-        <input type="text" name="placa" class="form-control" placeholder="Placa" required>
-    </div>
+<form method="POST" action="{{ route('motos.store') }}">
+@csrf
 
-    <div class="mb-2">
-        <input type="text" name="marca" class="form-control" placeholder="Marca">
-    </div>
+<input name="placa" class="form-control mb-2" placeholder="Placa">
+<input name="marca" class="form-control mb-2" placeholder="Marca">
+<input name="modelo" class="form-control mb-2" placeholder="Modelo">
 
-    <div class="mb-2">
-        <input type="text" name="modelo" class="form-control" placeholder="Modelo">
-    </div>
+<select name="cliente_id" class="form-control mb-2">
+    <option value="">Seleccione cliente</option>
+    @foreach($clientes as $c)
+        <option value="{{ $c->id }}">{{ $c->nombre }}</option>
+    @endforeach
+</select>
 
-    <div class="mb-2">
-        <input type="text" name="tipo_moto" class="form-control" placeholder="Tipo">
-    </div>
+<button class="btn btn-success">Guardar</button>
 
-    <div class="mb-2">
-        <input type="text" name="cilindraje" class="form-control" placeholder="Cilindraje">
-    </div>
-
-    <div class="mb-2">
-        <input type="text" name="color" class="form-control" placeholder="Color">
-    </div>
-
-    <div class="mb-2">
-        <select name="id_cliente" class="form-control">
-            <option value="">Seleccione Cliente</option>
-            @foreach($clientes as $c)
-                <option value="{{ $c->id_cliente }}">{{ $c->nombre }}</option>
-            @endforeach
-        </select>
-    </div>
-
-    <button class="btn btn-success">Guardar</button>
 </form>
 
 @endsection

@@ -7,55 +7,72 @@ use Illuminate\Http\Request;
 
 class TrabajadorController extends Controller
 {
-    // LISTAR TRABAJADORES
     public function index()
     {
-        $trabajadors = Trabajador::all();
-        return view('trabajadors.index', compact('trabajadors'));
+        $trabajadores = Trabajador::all();
+        return view('trabajadores.index', compact('trabajadores'));
     }
 
-    // FORMULARIO CREAR
     public function create()
     {
-        return view('trabajadors.create');
+        return view('trabajadores.create');
     }
 
-    // GUARDAR
     public function store(Request $request)
     {
-        Trabajador::create($request->all());
-        return redirect()->route('trabajadors.index');
+        $request->validate([
+            'nombre' => 'required|string|max:100',
+            'ci' => 'required|unique:trabajador s,ci',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string',
+            'porcentaje_comision' => 'required|numeric|min:1|max:100',
+            'estado' => 'required|in:activo,inactivo'
+        ]);
+
+        Trabajador::create([
+            'nombre' => $request->nombre,
+            'ci' => $request->ci,
+            'telefono' => $request->telefono,
+            'direccion' => $request->direccion,
+            'porcentaje_comision' => $request->porcentaje_comision,
+            'estado' => $request->estado,
+        ]);
+
+        return redirect()->route('trabajadores.index');
     }
 
-    // MOSTRAR UNO
-    public function show(string $id)
+    public function edit(Trabajador $trabajador)
     {
-        $trabajador = Trabajador::findOrFail($id);
-        return view('trabajadors.show', compact('trabajador'));
+        return view('trabajadores.edit', compact('trabajador'));
     }
 
-    // EDITAR
-    public function edit(string $id)
+    public function update(Request $request, Trabajador $trabajador)
     {
-        $trabajador = Trabajador::findOrFail($id);
-        return view('trabajadors.edit', compact('trabajador'));
+        $request->validate([
+            'nombre' => 'required|string|max:100',
+            'ci' => 'required',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string',
+            'porcentaje_comision' => 'required|numeric|min:1|max:100',
+            'estado' => 'required|in:activo,inactivo'
+        ]);
+
+        $trabajador->update([
+            'nombre' => $request->nombre,
+            'ci' => $request->ci,
+            'telefono' => $request->telefono,
+            'direccion' => $request->direccion,
+            'porcentaje_comision' => $request->porcentaje_comision,
+            'estado' => $request->estado,
+        ]);
+
+        return redirect()->route('trabajadores.index');
     }
 
-    // ACTUALIZAR
-    public function update(Request $request, string $id)
+    public function destroy(Trabajador $trabajador)
     {
-        $trabajador = Trabajador::findOrFail($id);
-        $trabajador->update($request->all());
-
-        return redirect()->route('trabajadors.index');
-    }
-
-    // ELIMINAR
-    public function destroy(string $id)
-    {
-        $trabajador = Trabajador::findOrFail($id);
         $trabajador->delete();
 
-        return back();
+        return redirect()->route('trabajadores.index');
     }
 }
