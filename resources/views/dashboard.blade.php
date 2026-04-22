@@ -114,4 +114,16 @@
 
 </div>
 
+ <div class="col-md-3">
+        <div class="card card-box p-3">
+            <div class="card-icon bg-green">
+                <i class="bi bi-currency-dollar"></i>
+            </div>
+            <small>INGRESOS HOY</small>
+            <h2>Bs. 00.00</h2>
+            <span class="text-muted">Hoy</span>
+        </div>
+    </div>
+
 @endsection
+
