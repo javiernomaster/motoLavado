@@ -72,6 +72,7 @@
     <a href="#"><i class="bi bi-person-badge"></i> Trabajadores</a>
     <a href="#"><i class="bi bi-gear"></i> Servicios</a>
     <a href="#"><i class="bi bi-truck"></i> Vehículos</a>
+    <a href="#"><i class="bi bi-mailbox"></i> Reportes</a>
 </div>
 
 <div class="content">

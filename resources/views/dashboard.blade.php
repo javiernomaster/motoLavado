@@ -2,14 +2,24 @@
 
 @section('content')
 
-<h3 class="mb-4">Dashboard</h3>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Dashboard</h3>
+
+    <!-- Botón Cerrar Sesión -->
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+        </button>
+    </form>
+</div>
 
 <div class="row g-4">
 
     <!-- Usuarios -->
     <div class="col-md-3">
         <div class="card card-box p-3">
-            <div class="card-icon bg-blue">
+            <div class="card-icon bg-blue">git pull origin main
                 <i class="bi bi-people"></i>
             </div>
             <small>USUARIOS</small>

@@ -1,0 +1,41 @@
+[33mcommit ff52865daf92c522a1671cc0d96c56b24a1e976b[m
+Author: marquitojr2344432 <marcosdanielgutierrezrojas7@gmail.com>
+Date:   Tue Apr 21 20:22:27 2026 -0400
+
+    Cambios para trabajo en equipo
+
+[1mdiff --git a/resources/views/.gitignore b/resources/views/.gitignore[m
+[1mnew file mode 100644[m
+[1mindex 0000000..37a93fb[m
+[1m--- /dev/null[m
+[1m+++ b/resources/views/.gitignore[m
+[36m@@ -0,0 +1,5 @@[m
+[32m+[m[32m#modules[m
+[32m+[m[32mnode_modules/[m
+[32m+[m
+[32m+[m[32mpackage-lock.json[m
+[32m+[m[41m [m
+\ No newline at end of file[m
+[1mdiff --git a/resources/views/dashboard.blade.php b/resources/views/dashboard.blade.php[m
+[1mindex ab47697..0ce913f 100644[m
+[1m--- a/resources/views/dashboard.blade.php[m
+[1m+++ b/resources/views/dashboard.blade.php[m
+[36m@@ -104,4 +104,16 @@[m
+ [m
+ </div>[m
+ [m
+[31m-@endsection[m
+\ No newline at end of file[m
+[32m+[m[32m <div class="col-md-3">[m
+[32m+[m[32m        <div class="card card-box p-3">[m
+[32m+[m[32m            <div class="card-icon bg-green">[m
+[32m+[m[32m                <i class="bi bi-currency-dollar"></i>[m
+[32m+[m[32m            </div>[m
+[32m+[m[32m            <small>INGRESOS HOY</small>[m
+[32m+[m[32m            <h2>Bs. 00.00</h2>[m
+[32m+[m[32m            <span class="text-muted">Hoy</span>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m    </div>[m
+[32m+[m
+[32m+[m[32m@endsection[m
+[41m+[m
