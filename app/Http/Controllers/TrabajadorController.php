@@ -29,14 +29,7 @@ class TrabajadorController extends Controller
             'estado' => 'required|in:activo,inactivo'
         ]);
 
-        Trabajador::create([
-            'nombre' => $request->nombre,
-            'ci' => $request->ci,
-            'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
-            'porcentaje_comision' => $request->porcentaje_comision,
-            'estado' => $request->estado,
-        ]);
+        Trabajador::create($request->all());
 
         return redirect()->route('trabajadores.index');
     }
@@ -57,14 +50,7 @@ class TrabajadorController extends Controller
             'estado' => 'required|in:activo,inactivo'
         ]);
 
-        $trabajador->update([
-            'nombre' => $request->nombre,
-            'ci' => $request->ci,
-            'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
-            'porcentaje_comision' => $request->porcentaje_comision,
-            'estado' => $request->estado,
-        ]);
+        $trabajador->update($request->all());
 
         return redirect()->route('trabajadores.index');
     }
