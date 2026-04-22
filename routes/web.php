@@ -3,7 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\MotoController;
-use App\Http\Controllers\LavadoOrdenController; // 🔥 FALTA ESTO
+use App\Http\Controllers\LavadoOrdenController;
+use App\Http\Controllers\ServicioController;      // 🔥 AGREGADO
+use App\Http\Controllers\TrabajadorController;    // 🔥 AGREGADO
 use Illuminate\Support\Facades\Route;
 
 // 🔥 REDIRECCIÓN AL LOGIN
@@ -23,11 +25,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 🔥 MÓDULOS
+    // 🚀 MÓDULOS PRINCIPALES
     Route::resource('clientes', ClienteController::class);
     Route::resource('motos', MotoController::class);
-    Route::resource('lavados', LavadoOrdenController::class); // ✅ ESTA ES LA CLAVE
-
+    Route::resource('servicios', ServicioController::class);     // 🔥 AGREGADO
+    Route::resource('trabajadors', TrabajadorController::class); // 🔥 AGREGADO
+    Route::resource('lavados', LavadoOrdenController::class);
 });
 
 // 🔑 AUTENTICACIÓN

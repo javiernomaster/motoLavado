@@ -21,6 +21,12 @@
             position: fixed;
             background: #fff;
             border-right: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .sidebar h5 {
+            padding: 15px;
+            color: #0d6efd;
         }
 
         .sidebar a {
@@ -62,47 +68,45 @@
         .bg-cyan { background: #06b6d4; }
     </style>
 </head>
+
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
-    <h5 class="p-3 text-primary">SISTEMA LAVERA</h5>
 
-    <!-- Dashboard -->
+    <h5>SISTEMA LAVERA</h5>
+
     <a href="{{ route('dashboard') }}">
         <i class="bi bi-speedometer2"></i> Dashboard
     </a>
 
-    <!-- Lavados -->
     <a href="{{ route('lavados.index') }}">
         <i class="bi bi-car-front"></i> Lavados
     </a>
 
-    <!-- Clientes -->
     <a href="{{ route('clientes.index') }}">
         <i class="bi bi-people"></i> Clientes
     </a>
 
-    <!-- Trabajadores (pendiente) -->
-    <a href="#">
+    <a href="{{ route('trabajadors.index') }}">
         <i class="bi bi-person-badge"></i> Trabajadores
     </a>
 
-    <!-- Servicios (pendiente) -->
-    <a href="#">
+    <a href="{{ route('servicios.index') }}">
         <i class="bi bi-gear"></i> Servicios
     </a>
 
-    <!-- Motos -->
     <a href="{{ route('motos.index') }}">
         <i class="bi bi-truck"></i> Motos
     </a>
 
-    <!-- Reportes (pendiente) -->
     <a href="#">
-        <i class="bi bi-mailbox"></i> Reportes
+        <i class="bi bi-bar-chart"></i> Reportes
     </a>
+
 </div>
 
+<!-- CONTENIDO -->
 <div class="content">
     @yield('content')
 </div>
