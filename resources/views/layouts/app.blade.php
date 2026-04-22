@@ -66,13 +66,41 @@
 
 <div class="sidebar">
     <h5 class="p-3 text-primary">SISTEMA LAVERA</h5>
-    <a href="#"><i class="bi bi-speedometer2"></i> Dashboard</a>
-    <a href="#"><i class="bi bi-car-front"></i> Lavados</a>
-    <a href="#"><i class="bi bi-people"></i> Clientes</a>
-    <a href="#"><i class="bi bi-person-badge"></i> Trabajadores</a>
-    <a href="#"><i class="bi bi-gear"></i> Servicios</a>
-    <a href="#"><i class="bi bi-truck"></i> Vehículos</a>
-    <a href="#"><i class="bi bi-mailbox"></i> Reportes</a>
+
+    <!-- Dashboard -->
+    <a href="{{ route('dashboard') }}">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+
+    <!-- Lavados -->
+    <a href="{{ route('lavados.index') }}">
+        <i class="bi bi-car-front"></i> Lavados
+    </a>
+
+    <!-- Clientes -->
+    <a href="{{ route('clientes.index') }}">
+        <i class="bi bi-people"></i> Clientes
+    </a>
+
+    <!-- Trabajadores (pendiente) -->
+    <a href="#">
+        <i class="bi bi-person-badge"></i> Trabajadores
+    </a>
+
+    <!-- Servicios (pendiente) -->
+    <a href="#">
+        <i class="bi bi-gear"></i> Servicios
+    </a>
+
+    <!-- Motos -->
+    <a href="{{ route('motos.index') }}">
+        <i class="bi bi-truck"></i> Motos
+    </a>
+
+    <!-- Reportes (pendiente) -->
+    <a href="#">
+        <i class="bi bi-mailbox"></i> Reportes
+    </a>
 </div>
 
 <div class="content">
