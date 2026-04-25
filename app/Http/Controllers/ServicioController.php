@@ -2,61 +2,70 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Servicio;
+use App\Models\LavadoOrden;
 use Illuminate\Http\Request;
 
-class ServicioController extends Controller
+class LavadoOrdenController extends Controller
 {
     public function index()
     {
-        $servicios = Servicio::all();
-        return view('servicios.index', compact('servicios'));
+        $lavados = LavadoOrden::all();
+        return view('lavados.index', compact('lavados'));
     }
 
     public function create()
     {
-        return view('servicios.create');
+        return view('lavados.create');
     }
 
+    // 🔥 GUARDAR (CORREGIDO)
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:100',
-            'precio' => 'required|numeric|min:0',
-            'descripcion' => 'nullable|string',
-            'tiempo_estimado' => 'nullable|integer|min:1',
-            'estado' => 'required|in:activo,inactivo'
+        LavadoOrden::create([
+            'fecha' => $request->fecha,
+            'estado' => $request->estado ?? 'Pendiente',
+            'cliente_id' => $request->cliente_id,
+            'moto_id' => $request->moto_id,
+            'servicio_id' => $request->servicio_id,
+            'trabajador_id' => $request->trabajador_id,
+            'precio_total' => $request->precio_total,
         ]);
 
-        Servicio::create($request->all());
-
-        return redirect()->route('servicios.index');
+        return redirect()->route('lavados.index')
+            ->with('success', 'Lavado registrado correctamente');
     }
 
-    public function edit(Servicio $servicio)
+    public function show(LavadoOrden $lavadoOrden)
     {
-        return view('servicios.edit', compact('servicio'));
+        return view('lavados.show', compact('lavadoOrden'));
     }
 
-    public function update(Request $request, Servicio $servicio)
+    public function edit(LavadoOrden $lavadoOrden)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:100',
-            'precio' => 'required|numeric|min:0',
-            'descripcion' => 'nullable|string',
-            'tiempo_estimado' => 'nullable|integer|min:1',
-            'estado' => 'required|in:activo,inactivo'
+        return view('lavados.edit', compact('lavadoOrden'));
+    }
+
+    public function update(Request $request, LavadoOrden $lavadoOrden)
+    {
+        $lavadoOrden->update([
+            'fecha' => $request->fecha,
+            'estado' => $request->estado,
+            'cliente_id' => $request->cliente_id,
+            'moto_id' => $request->moto_id,
+            'servicio_id' => $request->servicio_id,
+            'trabajador_id' => $request->trabajador_id,
+            'precio_total' => $request->precio_total,
         ]);
 
-        $servicio->update($request->all());
-
-        return redirect()->route('servicios.index');
+        return redirect()->route('lavados.index')
+            ->with('success', 'Lavado actualizado correctamente');
     }
 
-    public function destroy(Servicio $servicio)
+    public function destroy(LavadoOrden $lavadoOrden)
     {
-        $servicio->delete();
+        $lavadoOrden->delete();
 
-        return redirect()->route('servicios.index');
+        return redirect()->route('lavados.index')
+            ->with('success', 'Lavado eliminado correctamente');
     }
 }

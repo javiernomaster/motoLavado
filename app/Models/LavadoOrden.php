@@ -2,30 +2,46 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Cliente;
+use App\Models\Moto;
 
 class LavadoOrden extends Model
 {
-    // PK personalizada
+    use HasFactory;
+
+    protected $table = 'lavado_ordens';
+
     protected $primaryKey = 'id_orden';
 
-    // Campos permitidos
     protected $fillable = [
         'fecha',
         'estado',
-        'placa',
-        'id_cliente'
+        'cliente_id',
+        'moto_id',
+        'servicio_id',
+        'trabajador_id',
+        'precio_total'
     ];
 
-    // Relación con cliente
+    /*
+    |-----------------------------------------
+    | RELACIÓN: CLIENTE
+    |-----------------------------------------
+    */
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'id_cliente');
+        return $this->belongsTo(Cliente::class, 'cliente_id', 'id_cliente');
     }
 
-    // Relación con moto
+    /*
+    |-----------------------------------------
+    | RELACIÓN: MOTO
+    |-----------------------------------------
+    */
     public function moto()
     {
-        return $this->belongsTo(Moto::class, 'placa');
+        return $this->belongsTo(Moto::class, 'moto_id', 'id_moto');
     }
 }
