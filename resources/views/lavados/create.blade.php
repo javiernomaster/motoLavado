@@ -31,7 +31,9 @@
                     <select name="id_cliente" class="form-select form-select-lg" required>
                         <option selected disabled>Seleccione un cliente</option>
                         @foreach($clientes as $c)
-                            <option value="{{ $c->id_cliente }}">{{ $c->nombre }}</option>
+                            <option value="{{ $c->id_cliente }}">
+                                {{ $c->nombre }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -44,12 +46,13 @@
                     <select name="placa" class="form-select form-select-lg" required>
                         <option selected disabled>Seleccione una moto</option>
                         @foreach($motos as $m)
-                            <option value="{{ $m->placa }}">{{ $m->placa }}</option>
+                            <option value="{{ $m->placa }}">
+                                {{ $m->placa }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
 
-                <!-- Botón -->
                 <div class="d-flex justify-content-end">
                     <button class="btn btn-success btn-lg px-4">
                         <i class="bi bi-save me-1"></i> Guardar Lavado
