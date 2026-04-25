@@ -74,10 +74,10 @@
 <!-- SIDEBAR -->
 <div class="sidebar">
 
-    <h5>SISTEMA LAVERA</h5>
+    <h5>SISTEMA JM</h5>
 
     <a href="{{ route('dashboard') }}">
-        <i class="bi bi-speedometer2"></i> Dashboard
+        <i class="bi bi-CASA"></i> INICIO
     </a>
 
     <a href="{{ route('lavados.index') }}">
