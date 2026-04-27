@@ -2,70 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LavadoOrden;
+use App\Models\Servicio;
 use Illuminate\Http\Request;
 
-class LavadoOrdenController extends Controller
+class ServicioController extends Controller
 {
     public function index()
     {
-        $lavados = LavadoOrden::all();
-        return view('lavados.index', compact('lavados'));
+        $servicios = Servicio::all();
+        return view('servicios.index', compact('servicios'));
     }
 
     public function create()
     {
-        return view('lavados.create');
+        return view('servicios.create');
     }
 
-    // 🔥 GUARDAR (CORREGIDO)
     public function store(Request $request)
     {
-        LavadoOrden::create([
-            'fecha' => $request->fecha,
-            'estado' => $request->estado ?? 'Pendiente',
-            'cliente_id' => $request->cliente_id,
-            'moto_id' => $request->moto_id,
-            'servicio_id' => $request->servicio_id,
-            'trabajador_id' => $request->trabajador_id,
-            'precio_total' => $request->precio_total,
-        ]);
-
-        return redirect()->route('lavados.index')
-            ->with('success', 'Lavado registrado correctamente');
+        Servicio::create($request->all());
+        return redirect()->route('servicios.index')
+            ->with('success', 'Servicio registrado correctamente');
     }
 
-    public function show(LavadoOrden $lavadoOrden)
+    public function show(Servicio $servicio)
     {
-        return view('lavados.show', compact('lavadoOrden'));
+        return view('servicios.show', compact('servicio'));
     }
 
-    public function edit(LavadoOrden $lavadoOrden)
+    public function edit(Servicio $servicio)
     {
-        return view('lavados.edit', compact('lavadoOrden'));
+        return view('servicios.edit', compact('servicio'));
     }
 
-    public function update(Request $request, LavadoOrden $lavadoOrden)
+    public function update(Request $request, Servicio $servicio)
     {
-        $lavadoOrden->update([
-            'fecha' => $request->fecha,
-            'estado' => $request->estado,
-            'cliente_id' => $request->cliente_id,
-            'moto_id' => $request->moto_id,
-            'servicio_id' => $request->servicio_id,
-            'trabajador_id' => $request->trabajador_id,
-            'precio_total' => $request->precio_total,
-        ]);
-
-        return redirect()->route('lavados.index')
-            ->with('success', 'Lavado actualizado correctamente');
+        $servicio->update($request->all());
+        return redirect()->route('servicios.index')
+            ->with('success', 'Servicio actualizado correctamente');
     }
 
-    public function destroy(LavadoOrden $lavadoOrden)
+    public function destroy(Servicio $servicio)
     {
-        $lavadoOrden->delete();
-
-        return redirect()->route('lavados.index')
-            ->with('success', 'Lavado eliminado correctamente');
+        $servicio->delete();
+        return redirect()->route('servicios.index')
+            ->with('success', 'Servicio eliminado correctamente');
     }
 }

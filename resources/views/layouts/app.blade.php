@@ -77,7 +77,7 @@
     <h5>SISTEMA JM</h5>
 
     <a href="{{ route('dashboard') }}">
-        <i class="bi bi-CASA"></i> INICIO
+        <i class="bi bi-house"></i> INICIO
     </a>
 
     <a href="{{ route('lavados.index') }}">
@@ -100,7 +100,8 @@
         <i class="bi bi-truck"></i> Motos
     </a>
 
-    <a href="#">
+    <!-- 🔥 REPORTES CORREGIDO -->
+    <a href="{{ route('reportes.index') }}">
         <i class="bi bi-bar-chart"></i> Reportes
     </a>
 

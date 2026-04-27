@@ -37,6 +37,7 @@
                             <th>CI</th>
                             <th>Teléfono</th>
                             <th>Dirección</th>
+                            <th>🏍 Motos</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -51,6 +52,19 @@
                                 <td>{{ $c->ci }}</td>
                                 <td>{{ $c->telefono }}</td>
                                 <td>{{ $c->direccion }}</td>
+
+                                {{-- MOTOS --}}
+                                <td class="position-relative">
+                                    @if($c->motos->count() > 0)
+                                        <span class="badge bg-primary rounded-pill moto-badge"
+                                              style="cursor: pointer;"
+                                              data-motos="{{ $c->motos->map(fn($m) => $m->marca . ' ' . $m->modelo . ' — ' . $m->placa)->join('|') }}">
+                                            {{ $c->motos->count() }}
+                                        </span>
+                                    @else
+                                        <span class="badge bg-secondary rounded-pill">0</span>
+                                    @endif
+                                </td>
 
                                 {{-- ACCIONES --}}
                                 <td class="d-flex justify-content-center gap-2">
@@ -80,7 +94,7 @@
                         @empty
 
                             <tr>
-                                <td colspan="6" class="text-muted py-4">
+                                <td colspan="7" class="text-muted py-4">
                                     No hay clientes registrados
                                 </td>
                             </tr>
@@ -98,5 +112,45 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const tip = document.createElement('div');
+    tip.style.cssText = `
+        position: fixed;
+        background: #212529;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.8;
+        z-index: 9999;
+        pointer-events: none;
+        display: none;
+        white-space: nowrap;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    `;
+    document.body.appendChild(tip);
+
+    document.querySelectorAll('.moto-badge').forEach(badge => {
+        badge.addEventListener('mouseenter', function () {
+            const motos = this.dataset.motos.split('|');
+            tip.innerHTML = motos.map(m => '🏍 ' + m).join('<br>');
+            tip.style.display = 'block';
+        });
+
+        badge.addEventListener('mousemove', function (e) {
+            tip.style.left = (e.clientX + 12) + 'px';
+            tip.style.top  = (e.clientY + 12) + 'px';
+        });
+
+        badge.addEventListener('mouseleave', function () {
+            tip.style.display = 'none';
+        });
+    });
+
+});
+</script>
 
 @endsection

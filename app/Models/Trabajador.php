@@ -16,4 +16,9 @@ class Trabajador extends Model
         'porcentaje_comision',
         'estado'
     ];
+
+    public function lavados()
+    {
+        return $this->hasMany(LavadoOrden::class, 'trabajador_id');
+    }
 }

@@ -21,21 +21,19 @@ class TrabajadorController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:100',
-            'ci' => 'required|unique:trabajadores,ci',
-            'telefono' => 'nullable|string|max:20',
-            'direccion' => 'nullable|string',
+            'nombre'              => 'required|string|max:100',
+            'ci'                  => 'required|unique:trabajadores,ci',
+            'telefono'            => 'nullable|string|max:20',
+            'direccion'           => 'nullable|string',
             'porcentaje_comision' => 'required|numeric|min:1|max:100',
-            'estado' => 'required|in:activo,inactivo'
         ]);
 
         Trabajador::create([
-            'nombre' => $request->nombre,
-            'ci' => $request->ci,
-            'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
+            'nombre'              => $request->nombre,
+            'ci'                  => $request->ci,
+            'telefono'            => $request->telefono,
+            'direccion'           => $request->direccion,
             'porcentaje_comision' => $request->porcentaje_comision,
-            'estado' => $request->estado,
         ]);
 
         return redirect()->route('trabajadores.index');
@@ -49,21 +47,19 @@ class TrabajadorController extends Controller
     public function update(Request $request, Trabajador $trabajador)
     {
         $request->validate([
-            'nombre' => 'required|string|max:100',
-            'ci' => 'required|unique:trabajadores,ci,' . $trabajador->id,
-            'telefono' => 'nullable|string|max:20',
-            'direccion' => 'nullable|string',
+            'nombre'              => 'required|string|max:100',
+            'ci'                  => 'required|unique:trabajadores,ci,' . $trabajador->id,
+            'telefono'            => 'nullable|string|max:20',
+            'direccion'           => 'nullable|string',
             'porcentaje_comision' => 'required|numeric|min:1|max:100',
-            'estado' => 'required|in:activo,inactivo'
         ]);
 
         $trabajador->update([
-            'nombre' => $request->nombre,
-            'ci' => $request->ci,
-            'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
+            'nombre'              => $request->nombre,
+            'ci'                  => $request->ci,
+            'telefono'            => $request->telefono,
+            'direccion'           => $request->direccion,
             'porcentaje_comision' => $request->porcentaje_comision,
-            'estado' => $request->estado,
         ]);
 
         return redirect()->route('trabajadores.index');

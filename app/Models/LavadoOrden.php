@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Cliente;
 use App\Models\Moto;
+use App\Models\Trabajador;
+use App\Models\Servicio;
 
 class LavadoOrden extends Model
 {
@@ -25,23 +27,23 @@ class LavadoOrden extends Model
         'precio_total'
     ];
 
-    /*
-    |-----------------------------------------
-    | RELACIÓN: CLIENTE
-    |-----------------------------------------
-    */
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'cliente_id', 'id_cliente');
+        return $this->belongsTo(Cliente::class, 'cliente_id', 'id');
     }
 
-    /*
-    |-----------------------------------------
-    | RELACIÓN: MOTO
-    |-----------------------------------------
-    */
     public function moto()
     {
-        return $this->belongsTo(Moto::class, 'moto_id', 'id_moto');
+        return $this->belongsTo(Moto::class, 'moto_id', 'id');
+    }
+
+    public function trabajador()
+    {
+        return $this->belongsTo(Trabajador::class, 'trabajador_id', 'id');
+    }
+
+    public function servicio()
+    {
+        return $this->belongsTo(Servicio::class, 'servicio_id', 'id');
     }
 }

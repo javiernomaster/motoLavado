@@ -17,4 +17,9 @@ class Cliente extends Model
         'telefono',
         'direccion',
     ];
+
+    public function motos()
+    {
+        return $this->hasMany(Moto::class);
+    }
 }

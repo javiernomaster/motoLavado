@@ -36,8 +36,8 @@
                             <th>Nombre</th>
                             <th>CI</th>
                             <th>Teléfono</th>
-                            <th>Salario</th>
-                            <th>Estado</th>
+                            <th>Comisión</th>
+                            <th>Dirección</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -51,16 +51,8 @@
                                 <td class="fw-semibold">{{ $t->nombre }}</td>
                                 <td>{{ $t->ci }}</td>
                                 <td>{{ $t->telefono }}</td>
-                                <td>Bs {{ $t->salario }}</td>
-
-                                {{-- Estado --}}
-                                <td>
-                                    @if($t->estado == 'activo')
-                                        <span class="badge bg-success">Activo</span>
-                                    @else
-                                        <span class="badge bg-danger">Inactivo</span>
-                                    @endif
-                                </td>
+                                <td>{{ $t->porcentaje_comision }}%</td>
+                                <td>{{ $t->direccion }}</td>
 
                                 {{-- ACCIONES --}}
                                 <td class="d-flex justify-content-center gap-2">

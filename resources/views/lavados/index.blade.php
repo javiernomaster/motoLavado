@@ -34,9 +34,11 @@
                         <tr>
                             <th>ID</th>
                             <th>Cliente</th>
-                            <th>Moto</th>
+                            <th>Servicio</th>
+                            <th>Trabajador</th>
+                            <th>Moto (Modelo)</th>
                             <th>Fecha</th>
-                            <th>Estado</th>
+                            <th>Total a Pagar</th>
                         </tr>
                     </thead>
 
@@ -46,35 +48,20 @@
 
                             <tr>
                                 <td>{{ $l->id_orden }}</td>
-                                <td>{{ $l->cliente->nombre }}</td>
-                                <td>{{ $l->moto->placa }}</td>
+                                <td>{{ $l->cliente->nombre ?? '—' }}</td>
+                                <td>{{ $l->servicio->nombre ?? '—' }}</td>
+                                <td>{{ $l->trabajador->nombre ?? '—' }}</td>
+                                <td>{{ $l->moto->modelo ?? '—' }}</td>
                                 <td>{{ $l->fecha }}</td>
-
-                                {{-- ESTADO --}}
                                 <td>
-                                    @if($l->estado == 'Pendiente')
-                                        <span class="badge bg-warning text-dark">
-                                            Pendiente
-                                        </span>
-
-                                    @elseif($l->estado == 'En proceso')
-                                        <span class="badge bg-info text-dark">
-                                            En proceso
-                                        </span>
-
-                                    @else
-                                        <span class="badge bg-success">
-                                            {{ $l->estado }}
-                                        </span>
-                                    @endif
+                                    <strong>Bs. {{ number_format($l->precio_total, 2) }}</strong>
                                 </td>
-
                             </tr>
 
                         @empty
 
                             <tr>
-                                <td colspan="5" class="text-muted py-4">
+                                <td colspan="7" class="text-muted py-4">
                                     No hay lavados registrados
                                 </td>
                             </tr>
