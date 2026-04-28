@@ -14,10 +14,11 @@ class MotoController extends Controller
         return view('motos.index', compact('motos'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $clientes = Cliente::all();
-        return view('motos.create', compact('clientes'));
+        $clientes = Cliente::orderBy('nombre')->get();
+        $clientePreseleccionado = $request->query('cliente_id');
+        return view('motos.create', compact('clientes', 'clientePreseleccionado'));
     }
 
     public function store(Request $request)

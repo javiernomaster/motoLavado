@@ -10,10 +10,6 @@ class Moto extends Model
 {
     protected $table = 'motos';
 
-    protected $primaryKey = 'placa';
-    public $incrementing = false;
-    protected $keyType = 'string';
-
     protected $fillable = [
         'placa',
         'marca',
@@ -28,6 +24,6 @@ class Moto extends Model
 
     public function lavados()
     {
-        return $this->hasMany(LavadoOrden::class, 'placa', 'placa');
+        return $this->hasMany(LavadoOrden::class, 'moto_id');
     }
 }

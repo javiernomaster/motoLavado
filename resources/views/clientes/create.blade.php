@@ -1,21 +1,68 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
 
-<h3>Nuevo Cliente</h3>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <a href="{{ route('clientes.index') }}" class="btn btn-secondary me-2">
+                        ⬅ Volver
+                    </a>
+                    <h3 class="mb-0 d-inline">➕ Nuevo Cliente</h3>
+                </div>
+            </div>
 
-<form method="POST" action="{{ route('clientes.store') }}">
-    @csrf
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
 
-    <input name="nombre" class="form-control mb-2" placeholder="Nombre">
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-    <input name="ci" class="form-control mb-2" placeholder="CI">
+                    <form method="POST" action="{{ route('clientes.store') }}">
+                        @csrf
 
-    <input name="telefono" class="form-control mb-2" placeholder="Teléfono">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                            <input name="nombre" value="{{ old('nombre') }}" class="form-control @error('nombre') is-invalid @enderror" placeholder="Nombre completo">
+                            @error('nombre')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-    <input name="direccion" class="form-control mb-2" placeholder="Dirección">
+                        <div class="mb-3">
+                            <label class="form-label">CI <span class="text-danger">*</span></label>
+                            <input name="ci" value="{{ old('ci') }}" class="form-control @error('ci') is-invalid @enderror" placeholder="Carnet de identidad">
+                            @error('ci')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-    <button class="btn btn-success">Guardar</button>
-</form>
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <input name="telefono" value="{{ old('telefono') }}" class="form-control" placeholder="Número de teléfono">
+                        </div>
 
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input name="direccion" value="{{ old('direccion') }}" class="form-control" placeholder="Dirección">
+                        </div>
+
+                        <button class="btn btn-success w-100">💾 Guardar Cliente</button>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 @endsection

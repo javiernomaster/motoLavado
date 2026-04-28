@@ -10,56 +10,45 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| RUTA PRINCIPAL
-|--------------------------------------------------------------------------
-*/
+
 Route::get('/', function () {
     return redirect('/login');
 });
 
-/*
-|--------------------------------------------------------------------------
-| DASHBOARD
-|--------------------------------------------------------------------------
-*/
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| RUTAS PROTEGIDAS
-|--------------------------------------------------------------------------
-*/
+
 Route::middleware('auth')->group(function () {
 
-    /*
-    |--------------------------------
-    | PERFIL
-    |--------------------------------
-    */
+ 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    /*
-    |--------------------------------
-    | CRUD PRINCIPAL
-    |--------------------------------
-    */
+
+    Route::get('/clientes/papelera', [ClienteController::class, 'papelera'])->name('clientes.papelera');
+    Route::patch('/clientes/{id}/restaurar', [ClienteController::class, 'restaurar'])->name('clientes.restaurar');
+    Route::delete('/clientes/{id}/forzar', [ClienteController::class, 'forzarEliminar'])->name('clientes.forzar');
     Route::resource('clientes', ClienteController::class);
+
     Route::resource('motos', MotoController::class);
     Route::resource('servicios', ServicioController::class);
     Route::resource('trabajadores', TrabajadorController::class);
-    Route::resource('lavados', LavadoOrdenController::class);
 
-    /*
-    |--------------------------------
-    | 📊 REPORTES
-    |--------------------------------
-    */
+    // Lavados: rutas personalizadas DEBEN ir ANTES del Route::resource
+    Route::get('/lavados/papelera', [LavadoOrdenController::class, 'papelera'])->name('lavados.papelera');
+    Route::patch('/lavados/{id}/restaurar', [LavadoOrdenController::class, 'restaurar'])->name('lavados.restaurar');
+    Route::delete('/lavados/{id}/forzar', [LavadoOrdenController::class, 'forzarEliminar'])->name('lavados.forzar');
+    Route::resource('lavados', LavadoOrdenController::class);
+    Route::patch('/lavados/{lavado}/estado', [LavadoOrdenController::class, 'cambiarEstado'])->name('lavados.estado');
+    Route::get('/lavados/{lavado}/historial', [LavadoOrdenController::class, 'historial'])->name('lavados.historial');
+    Route::get('/lavados/{lavado}/cobrar', [LavadoOrdenController::class, 'formCobrar'])->name('lavados.cobrar.form');
+    Route::patch('/lavados/{lavado}/cobrar', [LavadoOrdenController::class, 'cobrar'])->name('lavados.cobrar');
+
+   
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 
     Route::get('/reportes/dia', [ReporteController::class, 'dia'])->name('reportes.dia');
@@ -69,7 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reportes/fecha', [ReporteController::class, 'porFecha'])->name('reportes.fecha');
     Route::post('/reportes/fecha', [ReporteController::class, 'buscarFecha'])->name('reportes.fecha.buscar');
 
-    // 👷 REPORTE GANANCIAS TRABAJADORES
+    
     Route::get('/reportes/trabajadores', [ReporteController::class, 'trabajadores'])->name('reportes.trabajadores');
 
 });

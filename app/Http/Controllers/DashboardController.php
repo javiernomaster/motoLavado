@@ -17,16 +17,26 @@ class DashboardController extends Controller
 
         $hoy = Carbon::today();
 
-        $serviciosHoy = LavadoOrden::whereDate('created_at', $hoy)->count();
+        $serviciosHoy = LavadoOrden::whereDate('fecha', $hoy)->count();
 
-        $ingresosHoy = LavadoOrden::whereDate('created_at', $hoy)
-            ->sum('precio_total');
+        // Fix: ingresos reales = monto pagado, no precio total
+        $ingresosHoy = LavadoOrden::whereDate('fecha', $hoy)
+            ->where('estado_pago', '!=', 'pendiente')
+            ->sum('monto_pagado');
+
+        // Deudas pendientes
+        $deudaTotal = LavadoOrden::where('estado_pago', '!=', 'pagado')
+            ->sum('saldo');
+
+        $lavadosPendientesPago = LavadoOrden::where('estado_pago', 'pendiente')->count();
 
         return view('dashboard', compact(
             'trabajadores',
             'clientes',
             'serviciosHoy',
-            'ingresosHoy'
+            'ingresosHoy',
+            'deudaTotal',
+            'lavadosPendientesPago'
         ));
     }
 }

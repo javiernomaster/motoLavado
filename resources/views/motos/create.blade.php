@@ -24,7 +24,9 @@
 <select name="cliente_id" class="form-control mb-2">
     <option value="">Seleccione cliente</option>
     @foreach($clientes as $c)
-        <option value="{{ $c->id }}">{{ $c->nombre }}</option>
+        <option value="{{ $c->id }}" {{ ($clientePreseleccionado == $c->id || old('cliente_id') == $c->id) ? 'selected' : '' }}>
+            {{ $c->nombre }}
+        </option>
     @endforeach
 </select>
 
