@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Servicio extends Model
 {
+    use HasFactory, SoftDeletes;
+
     protected $table = 'servicios';
 
     protected $fillable = [
@@ -15,4 +19,9 @@ class Servicio extends Model
         'tiempo_estimado',
         'estado'
     ];
+
+    public function lavados()
+    {
+        return $this->hasMany(LavadoOrden::class, 'servicio_id');
+    }
 }

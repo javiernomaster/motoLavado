@@ -4,12 +4,59 @@
 
 <div class="container mt-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <div class="d-flex align-items-center mb-2 mb-md-0">
             <a href="{{ route('reportes.index') }}" class="btn btn-secondary me-2">
                 ⬅ Volver a Reportes
             </a>
-            <h3 class="mb-0 d-inline">👷 Ganancias por Trabajador</h3>
+            <h3 class="mb-0">👷 Ganancias por Trabajador</h3>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <div class="btn-group" role="group">
+                <a href="{{ route('reportes.trabajadores-diario') }}" class="btn btn-outline-primary">
+                    📅 Diario
+                </a>
+                <a href="{{ route('reportes.trabajadores-semanal') }}" class="btn btn-outline-primary">
+                    📈 Semanal
+                </a>
+                <a href="{{ route('reportes.trabajadores-mensual') }}" class="btn btn-outline-primary">
+                    📊 Mensual
+                </a>
+            </div>
+            <div class="btn-group" role="group">
+                <a href="{{ route('reportes.trabajadores.excel', request()->query()) }}" class="btn btn-success">
+                    📊 Excel
+                </a>
+                <a href="{{ route('reportes.trabajadores.pdf', request()->query()) }}" class="btn btn-danger">
+                    📄 PDF
+                </a>
+            </div>
+        </div>
+        </div>
+        {{-- FILTRO TRABAJADOR --}}
+        <div class="card mt-3 shadow-sm border-0 rounded-4">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-6">
+                        <label>Seleccionar Trabajador</label>
+                        <select name="trabajador" class="form-select">
+                            <option value="">Todos</option>
+                            @foreach($trabajadores_disponibles ?? [] as $id => $nombre)
+                                <option value="{{ $id }}" {{ request('trabajador') == $id ? 'selected' : '' }}>
+                                    {{ $nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Desde</label>
+                        <input type="date" name="desde" value="{{ request('desde') }}" class="form-control">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-primary w-100">Filtrar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 

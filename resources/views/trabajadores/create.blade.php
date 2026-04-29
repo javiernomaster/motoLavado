@@ -1,49 +1,72 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2>Registrar Trabajador</h2>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <a href="{{ route('trabajadores.index') }}" class="btn btn-secondary me-2">
+                        ⬅ Volver
+                    </a>
+                    <h3 class="mb-0 d-inline">➕ Nuevo Trabajador</h3>
+                </div>
+            </div>
 
-    @if($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('trabajadores.store') }}">
+                        @csrf
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                            <input name="nombre" value="{{ old('nombre') }}" class="form-control @error('nombre') is-invalid @enderror">
+                            @error('nombre') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">CI <span class="text-danger">*</span></label>
+                            <input name="ci" value="{{ old('ci') }}" class="form-control @error('ci') is-invalid @enderror">
+                            @error('ci') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <input name="telefono" value="{{ old('telefono') }}" class="form-control @error('telefono') is-invalid @enderror">
+                            @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input name="direccion" value="{{ old('direccion') }}" class="form-control @error('direccion') is-invalid @enderror">
+                            @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Comisión % <span class="text-danger">*</span></label>
+                            <input name="porcentaje_comision" type="number" step="0.1" min="1" max="100" value="{{ old('porcentaje_comision') }}" class="form-control @error('porcentaje_comision') is-invalid @enderror">
+                            @error('porcentaje_comision') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ route('trabajadores.index') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button class="btn btn-success">💾 Guardar Trabajador</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    @endif
-
-    <form action="{{ route('trabajadores.store') }}" method="POST">
-        @csrf
-
-        <div class="mb-3">
-            <label>Nombre</label>
-            <input type="text" name="nombre" class="form-control" value="{{ old('nombre') }}" required>
-        </div>
-
-        <div class="mb-3">
-            <label>CI</label>
-            <input type="text" name="ci" class="form-control" value="{{ old('ci') }}" required>
-        </div>
-
-        <div class="mb-3">
-            <label>Teléfono</label>
-            <input type="text" name="telefono" class="form-control" value="{{ old('telefono') }}">
-        </div>
-
-        <div class="mb-3">
-            <label>Dirección</label>
-            <input type="text" name="direccion" class="form-control" value="{{ old('direccion') }}">
-        </div>
-
-        <div class="mb-3">
-            <label>Porcentaje de Comisión (%)</label>
-            <input type="number" name="porcentaje_comision" min="1" max="100" class="form-control" value="{{ old('porcentaje_comision') }}" required>
-        </div>
-
-        <button class="btn btn-success">Guardar</button>
-        <a href="{{ route('trabajadores.index') }}" class="btn btn-secondary">Cancelar</a>
-    </form>
+    </div>
 </div>
 @endsection
+
