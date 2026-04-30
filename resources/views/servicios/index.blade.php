@@ -2,9 +2,69 @@
 
 @section('content')
 
+<style>
+/* HEADER JM */
+.jm-header {
+    background: linear-gradient(135deg, #071a38 0%, #0b2f5b 45%, #114c8d 100%);
+    color: #fff;
+    padding: 22px 32px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(7,26,56,.30);
+    margin-bottom: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.jm-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.jm-header-title {
+    font-size: 20px;
+    font-weight: 800;
+}
+.jm-header-subtitle {
+    font-size: 13px;
+    opacity: .8;
+}
+.jm-header-module {
+    background: rgba(255,255,255,.15);
+    padding: 5px 14px;
+    border-radius: 50px;
+    font-size: 13px;
+}
+.jm-date {
+    font-size: 13px;
+    opacity: .85;
+    margin-top: 5px;
+}
+</style>
+
 <div class="container mt-4">
 
-    {{-- CABECERA --}}
+    {{-- HEADER NUEVO --}}
+    <div class="jm-header">
+        <div class="jm-header-left">
+            <img src="{{ asset('images/logoM.png') }}"
+                 style="width:60px;height:60px;object-fit:contain;">
+            <div>
+                <div class="jm-header-title">SISTEMA JM</div>
+                <div class="jm-header-subtitle">Panel de control</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="jm-header-module">
+                🧼 Módulo Servicios
+            </div>
+            <div class="jm-date">
+                {{ now()->locale('es')->isoFormat('dddd, D [de] MMMM YYYY') }}
+            </div>
+        </div>
+    </div>
+
+    {{-- CABECERA ORIGINAL --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
 
         <div>
@@ -19,7 +79,10 @@
             <a href="{{ route('servicios.papelera') }}" class="btn btn-outline-dark">
                 🗑 Papelera
             </a>
-            <a href="{{ route('servicios.create') }}" class="btn btn-primary">
+
+            <a href="{{ route('servicios.create') }}" 
+               class="btn text-white"
+               style="background:linear-gradient(135deg,#0b2f5b,#114c8d); border:none;">
                 ➕ Nuevo Servicio
             </a>
         </div>
@@ -29,7 +92,10 @@
     {{-- CONTADOR --}}
     @if(isset($totalServicios))
     <div class="mb-2 text-muted">
-        <small>Mostrando {{ $servicios->firstItem() ?? 0 }} - {{ $servicios->lastItem() ?? 0 }} de {{ $totalServicios }} servicio(s)</small>
+        <small>
+            Mostrando {{ $servicios->firstItem() ?? 0 }} - {{ $servicios->lastItem() ?? 0 }} 
+            de {{ $totalServicios }} servicio(s)
+        </small>
     </div>
     @endif
 
@@ -44,7 +110,9 @@
                 <div class="col-md-4 d-flex gap-2">
                     <button type="submit" class="btn btn-outline-primary w-100">🔍 Buscar</button>
                     @if(request('buscar'))
-                        <a href="{{ route('servicios.index') }}" class="btn btn-outline-secondary w-100">Limpiar</a>
+                        <a href="{{ route('servicios.index') }}" class="btn btn-outline-secondary w-100">
+                            Limpiar
+                        </a>
                     @endif
                 </div>
             </form>
@@ -97,21 +165,21 @@
                                     </span>
                                 </td>
 
-                                {{-- ACCIONES --}}
                                 <td class="d-flex justify-content-center gap-2">
 
                                     <a href="{{ route('servicios.show', $s) }}" class="btn btn-info btn-sm">
-                                         Ver
+                                        Ver
                                     </a>
+
                                     <a href="{{ route('servicios.edit', $s) }}" class="btn btn-warning btn-sm">
-                                         Editar
+                                        Editar
                                     </a>
 
                                     <form action="{{ route('servicios.destroy', $s) }}" method="POST" class="form-eliminar d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm">
-                                             Eliminar
+                                            Eliminar
                                         </button>
                                     </form>
 

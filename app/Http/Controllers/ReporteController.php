@@ -3,182 +3,85 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\LavadoOrden;
-use App\Models\Trabajador;
-use App\Models\Cliente;
-use App\Models\Moto;
-use App\Models\Servicio;
 use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf as PDF;
-use App\Exports\TrabajadoresExport;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Collection;
+use App\Models\Trabajador;
 
 class ReporteController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = LavadoOrden::with(['cliente', 'moto', 'servicio', 'trabajador']); // Removido filtros estrictos para mostrar todos
-
-        $query->when($request->cliente, function ($q) use ($request) {
-            $q->where('cliente_id', $request->cliente);
-        });
-
-        $query->when($request->estado, function ($q) use ($request) {
-            $q->where('estado', $request->estado);
-        });
-
-        if ($request->filled('desde') && $request->filled('hasta')) {
-            $query->whereBetween('fecha', [$request->desde, $request->hasta]);
-        }
-
-        $lavados = $query->orderBy('fecha', 'desc')->paginate(20);
-        $total = $lavados->sum('precio_total');
-
-        return view('reportes.index', compact('lavados', 'total'));
-    }
-
-    public function dia()
+    public function index()
     {
         $hoy = Carbon::today();
-        $trabajadores = $this->reportesPorPeriodo('dia', $hoy);
-        return view('reportes.trabajadores-diario', compact('trabajadores'))->with('periodo', 'Diario');
+
+        $trabajadores = Trabajador::with('lavados')->get();
+
+        $totalServicios = 0;
+        $gananciaTrabajadores = 0;
+        $gananciaSistema = 0;
+
+        foreach ($trabajadores as $t) {
+
+            // 👉 FILTRAR SOLO HOY
+            $lavadosHoy = $t->lavados->where('fecha', '>=', $hoy);
+
+            // ✅ TOTAL SERVICIOS HOY
+            $t->total_hoy = $lavadosHoy->count();
+
+            // ✅ GANANCIA HOY
+            $gananciaHoy = 0;
+
+            foreach ($lavadosHoy as $lavado) {
+
+                $comision = $t->porcentaje_comision / 100;
+                $gananciaTrabajador = $lavado->precio_total * $comision;
+
+                $gananciaHoy += $gananciaTrabajador;
+
+                // sistema
+                $gananciaSistema += ($lavado->precio_total - $gananciaTrabajador);
+            }
+
+            $t->ganancia_hoy = $gananciaHoy;
+
+            // acumuladores generales
+            $totalServicios += $t->total_hoy;
+            $gananciaTrabajadores += $gananciaHoy;
+        }
+
+        return view('reportes.index', compact(
+            'trabajadores',
+            'totalServicios',
+            'gananciaTrabajadores',
+            'gananciaSistema'
+        ));
     }
 
-    public function semana()
+    // 🔍 DETALLE
+    public function show($id)
     {
+        $trabajador = Trabajador::with('lavados.servicio', 'lavados.cliente', 'lavados.moto')
+            ->findOrFail($id);
+
+        $hoy = Carbon::today();
         $inicioSemana = Carbon::now()->startOfWeek();
-        $trabajadores = $this->reportesPorPeriodo('semana', $inicioSemana);
-        return view('reportes.trabajadores-semanal', compact('trabajadores'))->with('periodo', 'Semanal');
-    }
-
-    public function mes()
-    {
         $inicioMes = Carbon::now()->startOfMonth();
-        $trabajadores = $this->reportesPorPeriodo('mes', $inicioMes);
-        return view('reportes.trabajadores-mensual', compact('trabajadores'))->with('periodo', 'Mensual');
-    }
 
-    public function trabajadores(Request $request)
-    {
-        $query = LavadoOrden::query()
-            ->where('estado', 'completado')
-            ->where('estado_pago', 'pagado');
+        $lavadosHoy = $trabajador->lavados->where('fecha', '>=', $hoy);
+        $lavadosSemana = $trabajador->lavados->where('fecha', '>=', $inicioSemana);
+        $lavadosMes = $trabajador->lavados->where('fecha', '>=', $inicioMes);
 
-        if ($request->filled('trabajador')) {
-            $query->where('trabajador_id', $request->trabajador);
+        $totalGanado = 0;
+
+        foreach ($trabajador->lavados as $lavado) {
+            $comision = $trabajador->porcentaje_comision / 100;
+            $totalGanado += $lavado->precio_total * $comision;
         }
 
-        if ($request->filled('desde') && $request->filled('hasta')) {
-            $query->whereBetween('fecha', [$request->desde, $request->hasta]);
-        }
-
-        $lavadosPorTrabajador = $query->groupBy('trabajador_id')
-            ->selectRaw('trabajador_id, count(*) as total_servicios, sum(precio_total) as total_generado')
-            ->get();
-
-$trabajadores_disponibles = Trabajador::select('id', 'nombre', 'apellido')
-            ->orderBy('nombre')
-            ->pluck('nombre', 'id')
-            ->map(function ($nombreCompleto, $id) {
-                return [$id => $nombreCompleto];
-            });
-
-        $trabajadores = Trabajador::whereIn('id', $lavadosPorTrabajador->pluck('trabajador_id'))
-            ->get()
-            ->map(function ($trabajador) use ($lavadosPorTrabajador) {
-                $lavados = $lavadosPorTrabajador->firstWhere('trabajador_id', $trabajador->id);
-                return [
-                    'nombre' => $trabajador->nombre . ' ' . $trabajador->apellido,
-                    'porcentaje' => $trabajador->comision ?: 0,
-                    'total_servicios' => $lavados ? $lavados->total_servicios : 0,
-                    'total_generado' => $lavados ? $lavados->total_generado : 0,
-                    'ganancia' => $lavados ? ($lavados->total_generado * $trabajador->comision / 100) : 0
-                ];
-            });
-
-        return view('reportes.trabajadores', compact('trabajadores', 'trabajadores_disponibles'));
-    }
-
-    private function reportesPorPeriodo($periodo, $fechaInicio)
-    {
-        $query = LavadoOrden::query()
-            ->where('estado', 'completado')
-            ->where('estado_pago', 'pagado');
-
-        if ($periodo == 'dia') {
-            $query->whereDate('fecha', $fechaInicio);
-        } elseif ($periodo == 'semana') {
-            $query->whereBetween('fecha', [$fechaInicio, $fechaInicio->copy()->endOfWeek()]);
-        } elseif ($periodo == 'mes') {
-            $query->whereMonth('fecha', $fechaInicio->month)
-                  ->whereYear('fecha', $fechaInicio->year);
-        }
-
-        $lavadosPorTrabajador = $query->groupBy('trabajador_id')
-            ->selectRaw('trabajador_id, count(*) as total_servicios, sum(precio_total) as total_generado')
-            ->get();
-
-        $trabajadores = Trabajador::whereIn('id', $lavadosPorTrabajador->pluck('trabajador_id'))
-            ->get()
-            ->map(function ($trabajador) use ($lavadosPorTrabajador) {
-                $lavados = $lavadosPorTrabajador->firstWhere('trabajador_id', $trabajador->id);
-                return [
-                    'nombre' => $trabajador->nombre . ' ' . $trabajador->apellido,
-                    'porcentaje' => $trabajador->comision ?: 0,
-                    'total_servicios' => $lavados ? $lavados->total_servicios : 0,
-                    'total_generado' => $lavados ? $lavados->total_generado : 0,
-                    'ganancia' => $lavados ? ($lavados->total_generado * $trabajador->comision / 100) : 0
-                ];
-            });
-
-        return $trabajadores;
-    }
-
-    public function exportTrabajadoresExcel(Request $request)
-    {
-        $trabajadores = $this->getTrabajadoresFiltrados($request);
-        return Excel::download(new TrabajadoresExport($trabajadores), 'reporte_trabajadores_' . now()->format('Y-m-d') . '.xlsx');
-    }
-
-    public function exportTrabajadoresPdf(Request $request)
-    {
-        $trabajadores = $this->getTrabajadoresFiltrados($request);
-        $periodo = $request->get('periodo', 'General');
-$pdf = PDF::loadView('reportes.trabajadores-pdf', compact('trabajadores', 'periodo'));
-        return $pdf->download('reporte_trabajadores_' . now()->format('Y-m-d') . '.pdf');
-    }
-
-    private function getTrabajadoresFiltrados(Request $request): Collection
-    {
-        $query = LavadoOrden::query()
-            ->where('estado', 'completado')
-            ->where('estado_pago', 'pagado');
-
-        if ($request->filled('trabajador')) {
-            $query->where('trabajador_id', $request->trabajador);
-        }
-
-        if ($request->filled('desde') && $request->filled('hasta')) {
-            $query->whereBetween('fecha', [$request->desde, $request->hasta]);
-        }
-
-        $lavadosPorTrabajador = $query->groupBy('trabajador_id')
-            ->selectRaw('trabajador_id, count(*) as total_servicios, sum(precio_total) as total_generado')
-            ->get();
-
-        return Trabajador::whereIn('id', $lavadosPorTrabajador->pluck('trabajador_id'))
-            ->get()
-            ->map(function ($trabajador) use ($lavadosPorTrabajador) {
-                $lavados = $lavadosPorTrabajador->firstWhere('trabajador_id', $trabajador->id);
-                return [
-                    'nombre' => $trabajador->nombre . ' ' . $trabajador->apellido,
-                    'porcentaje' => $trabajador->comision ?: 0,
-                    'total_servicios' => $lavados ? $lavados->total_servicios : 0,
-                    'total_generado' => $lavados ? $lavados->total_generado : 0,
-                    'ganancia' => $lavados ? ($lavados->total_generado * $trabajador->comision / 100) : 0
-                ];
-            });
+        return view('reportes.show', compact(
+            'trabajador',
+            'lavadosHoy',
+            'lavadosSemana',
+            'lavadosMes',
+            'totalGanado'
+        ));
     }
 }
-

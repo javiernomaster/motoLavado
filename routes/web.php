@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\MotoController;
@@ -8,14 +10,30 @@ use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\TrabajadorController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\DashboardController;
-use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect('/login'));
+/*
+|--------------------------------------------------------------------------
+| RUTA INICIAL
+|--------------------------------------------------------------------------
+*/
+Route::get('/', function () {
+    return redirect('/login');
+});
 
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD
+|--------------------------------------------------------------------------
+*/
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+/*
+|--------------------------------------------------------------------------
+| RUTAS PROTEGIDAS
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
 
     // ================= PERFIL =================
@@ -60,18 +78,31 @@ Route::middleware('auth')->group(function () {
     Route::resource('lavados', LavadoOrdenController::class);
 
     // ================= REPORTES =================
+
+    // Vista principal (HOY)
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+
+    // Detalle por trabajador
+    Route::get('/reportes/trabajador/{id}', [ReporteController::class, 'show'])->name('reportes.trabajador');
+
+    // Filtros
     Route::get('/reportes/dia', [ReporteController::class, 'dia'])->name('reportes.dia');
     Route::get('/reportes/semana', [ReporteController::class, 'semana'])->name('reportes.semana');
     Route::get('/reportes/mes', [ReporteController::class, 'mes'])->name('reportes.mes');
+
+    // Por fecha
     Route::get('/reportes/fecha', [ReporteController::class, 'porFecha'])->name('reportes.fecha');
     Route::post('/reportes/fecha', [ReporteController::class, 'buscarFecha'])->name('reportes.fecha.buscar');
-    Route::get('/reportes/trabajadores', [ReporteController::class, 'trabajadores'])->name('reportes.trabajadores');
-    Route::get('/reportes/trabajadores-diario', [ReporteController::class, 'dia'])->name('reportes.trabajadores-diario');
-    Route::get('/reportes/trabajadores-semanal', [ReporteController::class, 'semana'])->name('reportes.trabajadores-semanal');
-    Route::get('/reportes/trabajadores-mensual', [ReporteController::class, 'mes'])->name('reportes.trabajadores-mensual');
+
+    // Exportaciones
     Route::get('/reportes/trabajadores/excel', [ReporteController::class, 'exportTrabajadoresExcel'])->name('reportes.trabajadores.excel');
     Route::get('/reportes/trabajadores/pdf', [ReporteController::class, 'exportTrabajadoresPdf'])->name('reportes.trabajadores.pdf');
+
 });
 
+/*
+|--------------------------------------------------------------------------
+| AUTH (LOGIN, REGISTER, ETC)
+|--------------------------------------------------------------------------
+*/
 require __DIR__.'/auth.php';

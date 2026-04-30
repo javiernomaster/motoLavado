@@ -2,73 +2,120 @@
 
 @section('content')
 
-<div class="container">
+<div class="container mt-4">
 
-    <h4 class="mb-4">Reporte de Lavados</h4>
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-0">📊 Reporte de Trabajadores</h3>
+            <small class="text-muted">Resumen del día {{ now()->format('d/m/Y') }}</small>
+        </div>
+    </div>
 
-    <form method="GET" action="{{ route('reportes.index') }}" class="row g-3 mb-4">
+    {{-- TARJETAS --}}
+    <div class="row mb-4">
 
-        <div class="col-md-3">
-            <label>Cliente</label>
-            <input type="text" name="cliente" value="{{ request('cliente') }}" class="form-control">
+        <div class="col-md-4">
+            <div class="card card-box">
+                <div class="card-body">
+                    <h6 class="text-muted">Servicios Hoy</h6>
+                    <h3 class="fw-bold text-primary">
+                        {{ $totalServicios ?? 0 }}
+                    </h3>
+                </div>
+                <div class="card-icon bg-blue">
+                    <i class="bi bi-droplet"></i>
+                </div>
+            </div>
         </div>
 
-        <div class="col-md-2">
-            <label>Estado</label>
-            <select name="estado" class="form-control">
-                <option value="">Todos</option>
-                <option value="Pendiente" {{ request('estado')=='Pendiente' ? 'selected' : '' }}>Pendiente</option>
-                <option value="En proceso" {{ request('estado')=='En proceso' ? 'selected' : '' }}>En proceso</option>
-                <option value="Finalizado" {{ request('estado')=='Finalizado' ? 'selected' : '' }}>Finalizado</option>
-            </select>
+        <div class="col-md-4">
+            <div class="card card-box">
+                <div class="card-body">
+                    <h6 class="text-muted">Ganancia Trabajadores</h6>
+                    <h3 class="fw-bold text-success">
+                        Bs. {{ number_format($gananciaTrabajadores ?? 0, 2) }}
+                    </h3>
+                </div>
+                <div class="card-icon bg-green">
+                    <i class="bi bi-cash"></i>
+                </div>
+            </div>
         </div>
 
-        <div class="col-md-2">
-            <label>Desde</label>
-            <input type="date" name="desde" value="{{ request('desde') }}" class="form-control">
+        <div class="col-md-4">
+            <div class="card card-box">
+                <div class="card-body">
+                    <h6 class="text-muted">Trabajadores Activos</h6>
+                    <h3 class="fw-bold text-dark">
+                        {{ $trabajadores->count() }}
+                    </h3>
+                </div>
+                <div class="card-icon bg-orange">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
         </div>
 
-        <div class="col-md-2">
-            <label>Hasta</label>
-            <input type="date" name="hasta" value="{{ request('hasta') }}" class="form-control">
+    </div>
+
+    {{-- TABLA --}}
+    <div class="card shadow-sm border-0 rounded-4">
+
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">👷 Listado de Trabajadores</h5>
         </div>
 
-        <div class="col-md-3 d-flex align-items-end">
-            <button class="btn btn-primary w-100">Filtrar</button>
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Trabajador</th>
+                            <th>Servicios Hoy</th>
+                            <th>Ganancia Hoy</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($trabajadores as $t)
+                        <tr style="cursor:pointer"
+                            onclick="window.location='{{ route('reportes.trabajador', $t->id) }}'">
+
+                            <td class="fw-semibold">
+                                <i class="bi bi-person-circle me-1"></i>
+                                {{ $t->nombre }}
+                            </td>
+
+                            <td>
+                                <span class="badge bg-primary rounded-pill px-3 py-2">
+                                    {{ $t->total_hoy }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                    Bs. {{ number_format($t->ganancia_hoy,2) }}
+                                </span>
+                            </td>
+
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="3" class="text-muted py-5">
+                                <i class="bi bi-inbox fs-1"></i>
+                                <p class="mt-2 mb-0">No hay registros hoy</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+
+                </table>
+            </div>
+
         </div>
-
-    </form>
-
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-
-            <thead class="table-dark">
-                <tr>
-                    <th>Fecha</th>
-                    <th>Cliente</th>
-                    <th>Placa</th>
-                    <th>Servicio</th>
-                    <th>Trabajador</th>
-                    <th>Estado</th>
-                    <th>Precio</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach($lavados as $lavado)
-                <tr>
-                    <td>{{ \Carbon\Carbon::parse($lavado->fecha)->format('d/m/Y') }}</td>
-                    <td>{{ $lavado->cliente->nombre ?? '' }}</td>
-                    <td>{{ $lavado->moto->placa ?? '' }}</td>
-                    <td>{{ $lavado->servicio->nombre ?? '' }}</td>
-                    <td>{{ $lavado->trabajador->nombre ?? '' }}</td>
-                    <td>{{ $lavado->estado }}</td>
-                    <td>{{ $lavado->precio_total }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-
-        </table>
     </div>
 
 </div>
