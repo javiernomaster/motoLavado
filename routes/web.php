@@ -11,29 +11,14 @@ use App\Http\Controllers\TrabajadorController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\DashboardController;
 
-/*
-|--------------------------------------------------------------------------
-| RUTA INICIAL
-|--------------------------------------------------------------------------
-*/
 Route::get('/', function () {
     return redirect('/login');
 });
 
-/*
-|--------------------------------------------------------------------------
-| DASHBOARD
-|--------------------------------------------------------------------------
-*/
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| RUTAS PROTEGIDAS
-|--------------------------------------------------------------------------
-*/
 Route::middleware('auth')->group(function () {
 
     // ================= PERFIL =================
@@ -69,43 +54,41 @@ Route::middleware('auth')->group(function () {
     Route::get('lavados/papelera', [LavadoOrdenController::class, 'papelera'])->name('lavados.papelera');
     Route::patch('lavados/{lavado}/restaurar', [LavadoOrdenController::class, 'restaurar'])->name('lavados.restaurar');
     Route::delete('lavados/{lavado}/forzar', [LavadoOrdenController::class, 'forzarEliminar'])->name('lavados.forzar');
-
     Route::patch('lavados/{lavado}/estado', [LavadoOrdenController::class, 'cambiarEstado'])->name('lavados.estado');
     Route::get('lavados/{lavado}/historial', [LavadoOrdenController::class, 'historial'])->name('lavados.historial');
     Route::get('lavados/{lavado}/cobrar', [LavadoOrdenController::class, 'formCobrar'])->name('lavados.cobrar.form');
     Route::patch('lavados/{lavado}/cobrar', [LavadoOrdenController::class, 'cobrar'])->name('lavados.cobrar');
-
     Route::resource('lavados', LavadoOrdenController::class);
 
     // ================= REPORTES =================
-
-    // Vista principal (HOY)
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
-
-    // ✅ NUEVO - Servicios del día (debe ir ANTES de las rutas con parámetros)
     Route::get('/reportes/servicios-hoy', [ReporteController::class, 'serviciosHoy'])->name('reportes.servicios.hoy');
+
+    // AJAX Registro JM
+    Route::get('/reportes/registros/dia',    [ReporteController::class, 'registrosDia'])->name('reportes.registros.dia');
+    Route::get('/reportes/registros/semana', [ReporteController::class, 'registrosSemana'])->name('reportes.registros.semana');
+    Route::get('/reportes/registros/mes',    [ReporteController::class, 'registrosMes'])->name('reportes.registros.mes');
+
+    // Exportación
+    Route::get('/reportes/export/pdf',  [ReporteController::class, 'exportRegistrosPdf'])->name('reportes.export.pdf');
+    Route::get('/reportes/export/word', [ReporteController::class, 'exportRegistrosWord'])->name('reportes.export.word');
 
     // Detalle por trabajador
     Route::get('/reportes/trabajador/{id}', [ReporteController::class, 'show'])->name('reportes.trabajador');
 
     // Filtros
-    Route::get('/reportes/dia', [ReporteController::class, 'dia'])->name('reportes.dia');
+    Route::get('/reportes/dia',    [ReporteController::class, 'dia'])->name('reportes.dia');
     Route::get('/reportes/semana', [ReporteController::class, 'semana'])->name('reportes.semana');
-    Route::get('/reportes/mes', [ReporteController::class, 'mes'])->name('reportes.mes');
+    Route::get('/reportes/mes',    [ReporteController::class, 'mes'])->name('reportes.mes');
 
     // Por fecha
-    Route::get('/reportes/fecha', [ReporteController::class, 'porFecha'])->name('reportes.fecha');
+    Route::get('/reportes/fecha',  [ReporteController::class, 'porFecha'])->name('reportes.fecha');
     Route::post('/reportes/fecha', [ReporteController::class, 'buscarFecha'])->name('reportes.fecha.buscar');
 
-    // Exportaciones
+    // Exportaciones antiguas
     Route::get('/reportes/trabajadores/excel', [ReporteController::class, 'exportTrabajadoresExcel'])->name('reportes.trabajadores.excel');
-    Route::get('/reportes/trabajadores/pdf', [ReporteController::class, 'exportTrabajadoresPdf'])->name('reportes.trabajadores.pdf');
+    Route::get('/reportes/trabajadores/pdf',   [ReporteController::class, 'exportTrabajadoresPdf'])->name('reportes.trabajadores.pdf');
 
 });
 
-/*
-|--------------------------------------------------------------------------
-| AUTH (LOGIN, REGISTER, ETC)
-|--------------------------------------------------------------------------
-*/
 require __DIR__.'/auth.php';
