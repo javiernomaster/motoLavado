@@ -23,8 +23,9 @@ class ClienteController extends Controller
             });
         }
 
-        $clientes = $query->paginate(15)->withQueryString();
+        // ✅ PRIMERO el total, LUEGO el paginate
         $totalClientes = $query->count();
+        $clientes = $query->paginate(15)->withQueryString();
 
         return view('clientes.index', compact('clientes', 'totalClientes'));
     }
@@ -45,12 +46,11 @@ class ClienteController extends Controller
     {
         $cliente->load(['motos.lavados.servicio', 'motos.lavados.trabajador', 'lavados.moto', 'lavados.servicio', 'lavados.trabajador']);
 
-        // Estadísticas
-        $totalLavados = $cliente->lavados->count();
-        $totalGastado = $cliente->lavados->sum('precio_total');
-        $totalPagado = $cliente->lavados->sum('monto_pagado');
+        $totalLavados   = $cliente->lavados->count();
+        $totalGastado   = $cliente->lavados->sum('precio_total');
+        $totalPagado    = $cliente->lavados->sum('monto_pagado');
         $saldoPendiente = $cliente->lavados->sum('saldo');
-        $ultimaVisita = $cliente->lavados->sortByDesc('fecha')->first();
+        $ultimaVisita   = $cliente->lavados->sortByDesc('fecha')->first();
 
         return view('clientes.show', compact('cliente', 'totalLavados', 'totalGastado', 'totalPagado', 'saldoPendiente', 'ultimaVisita'));
     }
@@ -78,7 +78,6 @@ class ClienteController extends Controller
         return redirect()->route('clientes.index')->with('success', 'Cliente eliminado correctamente.');
     }
 
-    // Papelera
     public function papelera()
     {
         $clientes = Cliente::onlyTrashed()->withCount('motos')->paginate(15);
@@ -110,4 +109,3 @@ class ClienteController extends Controller
         return redirect()->route('clientes.papelera')->with('success', 'Cliente eliminado permanentemente.');
     }
 }
-

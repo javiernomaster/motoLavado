@@ -82,6 +82,9 @@ Route::middleware('auth')->group(function () {
     // Vista principal (HOY)
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 
+    // ✅ NUEVO - Servicios del día (debe ir ANTES de las rutas con parámetros)
+    Route::get('/reportes/servicios-hoy', [ReporteController::class, 'serviciosHoy'])->name('reportes.servicios.hoy');
+
     // Detalle por trabajador
     Route::get('/reportes/trabajador/{id}', [ReporteController::class, 'show'])->name('reportes.trabajador');
 

@@ -2,50 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LavadoOrden;
+use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use App\Models\Trabajador;
 
 class ReporteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $hoy = Carbon::today();
 
-        $trabajadores = Trabajador::with('lavados')->get();
+        $trabajadores = Trabajador::where('estado', 1)
+            ->withCount(['lavados as total_hoy' => function ($q) use ($hoy) {
+                $q->whereDate('fecha', $hoy);
+            }])
+            ->withSum(['lavados as ganancia_hoy' => function ($q) use ($hoy) {
+                $q->whereDate('fecha', $hoy);
+            }], 'precio_total')
+            ->get()
+            ->map(function ($t) {
+                $t->ganancia_sistema_hoy = ($t->ganancia_hoy ?? 0) * 0.5;
+                $t->ganancia_hoy        = ($t->ganancia_hoy ?? 0) * 0.5;
+                return $t;
+            });
 
-        $totalServicios = 0;
-        $gananciaTrabajadores = 0;
-        $gananciaSistema = 0;
-
-        foreach ($trabajadores as $t) {
-
-            // 👉 FILTRAR SOLO HOY
-            $lavadosHoy = $t->lavados->where('fecha', '>=', $hoy);
-
-            // ✅ TOTAL SERVICIOS HOY
-            $t->total_hoy = $lavadosHoy->count();
-
-            // ✅ GANANCIA HOY
-            $gananciaHoy = 0;
-
-            foreach ($lavadosHoy as $lavado) {
-
-                $comision = $t->porcentaje_comision / 100;
-                $gananciaTrabajador = $lavado->precio_total * $comision;
-
-                $gananciaHoy += $gananciaTrabajador;
-
-                // sistema
-                $gananciaSistema += ($lavado->precio_total - $gananciaTrabajador);
-            }
-
-            $t->ganancia_hoy = $gananciaHoy;
-
-            // acumuladores generales
-            $totalServicios += $t->total_hoy;
-            $gananciaTrabajadores += $gananciaHoy;
-        }
+        $totalServicios       = $trabajadores->sum('total_hoy');
+        $gananciaTrabajadores = $trabajadores->sum('ganancia_hoy');
+        $gananciaSistema      = $trabajadores->sum('ganancia_sistema_hoy');
 
         return view('reportes.index', compact(
             'trabajadores',
@@ -55,33 +39,110 @@ class ReporteController extends Controller
         ));
     }
 
-    // 🔍 DETALLE
     public function show($id)
     {
-        $trabajador = Trabajador::with('lavados.servicio', 'lavados.cliente', 'lavados.moto')
-            ->findOrFail($id);
+        $trabajador = Trabajador::findOrFail($id);
 
+        $ordenes = LavadoOrden::where('trabajador_id', $id)
+            ->whereDate('fecha', Carbon::today())
+            ->with(['cliente', 'moto', 'servicio'])
+            ->get();
+
+        return view('reportes.trabajador', compact('trabajador', 'ordenes'));
+    }
+
+    public function serviciosHoy()
+    {
         $hoy = Carbon::today();
-        $inicioSemana = Carbon::now()->startOfWeek();
-        $inicioMes = Carbon::now()->startOfMonth();
 
-        $lavadosHoy = $trabajador->lavados->where('fecha', '>=', $hoy);
-        $lavadosSemana = $trabajador->lavados->where('fecha', '>=', $inicioSemana);
-        $lavadosMes = $trabajador->lavados->where('fecha', '>=', $inicioMes);
+        $ordenes = LavadoOrden::whereDate('fecha', $hoy)
+            ->with(['cliente', 'moto', 'servicio', 'trabajador'])
+            ->get();
 
-        $totalGanado = 0;
+        return view('reportes.servicios_hoy', compact('ordenes'));
+    }
 
-        foreach ($trabajador->lavados as $lavado) {
-            $comision = $trabajador->porcentaje_comision / 100;
-            $totalGanado += $lavado->precio_total * $comision;
-        }
+    public function dia(Request $request)
+    {
+        $fecha = $request->filled('fecha') ? Carbon::parse($request->fecha) : Carbon::today();
 
-        return view('reportes.show', compact(
-            'trabajador',
-            'lavadosHoy',
-            'lavadosSemana',
-            'lavadosMes',
-            'totalGanado'
-        ));
+        $trabajadores = Trabajador::where('estado', 1)
+            ->withCount(['lavados as total_dia' => function ($q) use ($fecha) {
+                $q->whereDate('fecha', $fecha);
+            }])
+            ->withSum(['lavados as ganancia_dia' => function ($q) use ($fecha) {
+                $q->whereDate('fecha', $fecha);
+            }], 'precio_total')
+            ->get();
+
+        return view('reportes.dia', compact('trabajadores', 'fecha'));
+    }
+
+    public function semana()
+    {
+        $inicio = Carbon::now()->startOfWeek();
+        $fin    = Carbon::now()->endOfWeek();
+
+        $trabajadores = Trabajador::where('estado', 1)
+            ->withCount(['lavados as total_semana' => function ($q) use ($inicio, $fin) {
+                $q->whereBetween('fecha', [$inicio, $fin]);
+            }])
+            ->withSum(['lavados as ganancia_semana' => function ($q) use ($inicio, $fin) {
+                $q->whereBetween('fecha', [$inicio, $fin]);
+            }], 'precio_total')
+            ->get();
+
+        return view('reportes.semana', compact('trabajadores', 'inicio', 'fin'));
+    }
+
+    public function mes()
+    {
+        $inicio = Carbon::now()->startOfMonth();
+        $fin    = Carbon::now()->endOfMonth();
+
+        $trabajadores = Trabajador::where('estado', 1)
+            ->withCount(['lavados as total_mes' => function ($q) use ($inicio, $fin) {
+                $q->whereBetween('fecha', [$inicio, $fin]);
+            }])
+            ->withSum(['lavados as ganancia_mes' => function ($q) use ($inicio, $fin) {
+                $q->whereBetween('fecha', [$inicio, $fin]);
+            }], 'precio_total')
+            ->get();
+
+        return view('reportes.mes', compact('trabajadores', 'inicio', 'fin'));
+    }
+
+    public function porFecha()
+    {
+        return view('reportes.fecha');
+    }
+
+    public function buscarFecha(Request $request)
+    {
+        $request->validate(['fecha' => 'required|date']);
+        $fecha = Carbon::parse($request->fecha);
+
+        $trabajadores = Trabajador::where('estado', 1)
+            ->withCount(['lavados as total_fecha' => function ($q) use ($fecha) {
+                $q->whereDate('fecha', $fecha);
+            }])
+            ->withSum(['lavados as ganancia_fecha' => function ($q) use ($fecha) {
+                $q->whereDate('fecha', $fecha);
+            }], 'precio_total')
+            ->get();
+
+        return view('reportes.fecha', compact('trabajadores', 'fecha'));
+    }
+
+    public function exportTrabajadoresExcel()
+    {
+        // Implementar con Laravel Excel si lo tienes instalado
+        return back()->with('info', 'Exportación Excel próximamente.');
+    }
+
+    public function exportTrabajadoresPdf()
+    {
+        // Implementar con DomPDF o similar
+        return back()->with('info', 'Exportación PDF próximamente.');
     }
 }

@@ -15,7 +15,7 @@
     {{-- TARJETAS --}}
     <div class="row mb-4">
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card card-box">
                 <div class="card-body">
                     <h6 class="text-muted">Servicios Hoy</h6>
@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card card-box">
                 <div class="card-body">
                     <h6 class="text-muted">Ganancia Trabajadores</h6>
@@ -43,7 +43,21 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <div class="card card-box">
+                <div class="card-body">
+                    <h6 class="text-muted">Ganancia Sistema JM</h6>
+                    <h3 class="fw-bold text-warning">
+                        Bs. {{ number_format($gananciaSistema ?? 0, 2) }}
+                    </h3>
+                </div>
+                <div class="card-icon bg-warning">
+                    <i class="bi bi-building"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
             <div class="card card-box">
                 <div class="card-body">
                     <h6 class="text-muted">Trabajadores Activos</h6>
@@ -76,6 +90,7 @@
                             <th>Trabajador</th>
                             <th>Servicios Hoy</th>
                             <th>Ganancia Hoy</th>
+                            <th>Ganancia Sistema JM</th>
                         </tr>
                     </thead>
 
@@ -97,14 +112,20 @@
 
                             <td>
                                 <span class="badge bg-success rounded-pill px-3 py-2">
-                                    Bs. {{ number_format($t->ganancia_hoy,2) }}
+                                    Bs. {{ number_format($t->ganancia_hoy, 2) }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                    Bs. {{ number_format($t->ganancia_sistema_hoy ?? 0, 2) }}
                                 </span>
                             </td>
 
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="text-muted py-5">
+                            <td colspan="4" class="text-muted py-5">
                                 <i class="bi bi-inbox fs-1"></i>
                                 <p class="mt-2 mb-0">No hay registros hoy</p>
                             </td>
