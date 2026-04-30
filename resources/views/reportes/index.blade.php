@@ -90,8 +90,9 @@
     border: none;
     transition: all .2s;
 }
-.btn-exp-pdf  { background:#dc3545; color:#fff; }
-.btn-exp-word { background:#2b579a; color:#fff; }
+.btn-exp-pdf   { background:#dc3545; color:#fff; }
+.btn-exp-excel { background:#1d6f42; color:#fff; }
+.btn-exp-word  { background:#2b579a; color:#fff; }
 .btn-exp:hover { opacity:.85; transform:translateY(-1px); }
 
 .registro-resumen {
@@ -131,6 +132,118 @@
     padding:4px 10px; border-radius:50px; font-size:11px; font-weight:600;
 }
 .sin-datos { text-align:center; padding:48px; color:#adb5bd; }
+
+/* ── BUSCADOR ─────────────────────────────────────────── */
+.buscador-card {
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(7,26,56,.12);
+    overflow: hidden;
+    margin-bottom: 28px;
+}
+.buscador-header {
+    background: linear-gradient(135deg, #071a38, #114c8d);
+    color: #fff;
+    padding: 14px 24px;
+    font-weight: 800;
+    font-size: 15px;
+}
+.buscador-body { padding: 20px 24px; background: #fff; }
+.buscador-input-wrap {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.buscador-input {
+    flex: 1;
+    min-width: 220px;
+    padding: 10px 18px;
+    border: 2px solid #dee2e6;
+    border-radius: 50px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+}
+.buscador-input:focus { border-color: #114c8d; }
+.btn-buscar {
+    background: linear-gradient(135deg, #0b2f5b, #114c8d);
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .2s;
+}
+.btn-buscar:hover { opacity:.88; transform:translateY(-1px); }
+.btn-limpiar {
+    background: #f1f3f8;
+    color: #495057;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .2s;
+}
+.btn-limpiar:hover { background:#e2e6ea; }
+
+.resultado-card {
+    margin-top: 16px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    display: none;
+}
+.resultado-card.show { display: block; }
+
+.resultado-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 14px;
+    cursor: pointer;
+    transition: background .15s;
+}
+.resultado-item:last-child { border-bottom: none; }
+.resultado-item:hover { background: #f0f5ff; }
+
+.resultado-icon {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0b2f5b, #114c8d);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+.resultado-info { flex: 1; }
+.resultado-titulo { font-weight: 700; font-size: 14px; color: #0b2f5b; }
+.resultado-sub { font-size: 12px; color: #6c757d; margin-top: 2px; }
+.resultado-precio {
+    font-weight: 800;
+    font-size: 15px;
+    color: #198754;
+    white-space: nowrap;
+}
+
+.sin-resultados {
+    text-align: center;
+    padding: 32px;
+    color: #adb5bd;
+    font-size: 14px;
+}
+
+.buscador-spinner {
+    text-align: center;
+    padding: 24px;
+    color: #6c757d;
+    display: none;
+}
+.buscador-spinner.show { display: block; }
 </style>
 
 <div class="container mt-4">
@@ -151,7 +264,7 @@
     </div>
 
     {{-- FILA SUPERIOR --}}
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex justify-content: space-between align-items-center mb-3 flex-wrap gap-2">
         <h6 class="text-muted mb-0">Resumen del día</h6>
         <button class="btn-registro-jm" id="btnRegistroJM" onclick="toggleRegistroJM()">
             📋 Registro JM
@@ -194,6 +307,38 @@
         </div>
     </div>
 
+    {{-- ══════════════════════════════════════════════════════ --}}
+    {{-- BUSCADOR DE LAVADOS                                    --}}
+    {{-- ══════════════════════════════════════════════════════ --}}
+    <div class="buscador-card card">
+        <div class="buscador-header">
+            🔍 Buscador de Lavados
+        </div>
+        <div class="buscador-body">
+            <div class="buscador-input-wrap">
+                <input
+                    type="text"
+                    id="inputBuscar"
+                    class="buscador-input"
+                    placeholder="Buscar por cliente, placa, trabajador o servicio..."
+                    oninput="buscarLavado(this.value)"
+                    autocomplete="off"
+                >
+                <button class="btn-limpiar" onclick="limpiarBusqueda()">✖ Limpiar</button>
+            </div>
+
+            {{-- Spinner --}}
+            <div class="buscador-spinner" id="buscadorSpinner">
+                <div class="jm-spinner" style="margin:0 auto;"></div>
+            </div>
+
+            {{-- Resultados --}}
+            <div class="resultado-card" id="resultadoCard">
+                <div id="resultadoLista"></div>
+            </div>
+        </div>
+    </div>
+
     {{-- PANEL REGISTRO JM --}}
     <div id="panelRegistroJM">
         <div class="registro-panel-card card">
@@ -208,8 +353,9 @@
                     </div>
                 </div>
                 <div class="export-btns">
-                    <button class="btn-exp btn-exp-pdf"  onclick="exportar('pdf')">📄 PDF</button>
-                    <button class="btn-exp btn-exp-word" onclick="exportar('word')">📝 Word</button>
+                    <button class="btn-exp btn-exp-pdf"   onclick="exportar('pdf')">📄 PDF</button>
+                    <button class="btn-exp btn-exp-excel" onclick="exportar('excel')">📊 Excel</button>
+                    <button class="btn-exp btn-exp-word"  onclick="exportar('word')">📝 Word</button>
                 </div>
             </div>
 
@@ -290,7 +436,77 @@
 <script>
 let periodoActual = 'dia';
 let panelAbierto  = false;
+let buscarTimeout = null;
 
+// ── BUSCADOR ─────────────────────────────────────────────
+function buscarLavado(query) {
+    clearTimeout(buscarTimeout);
+    const spinner  = document.getElementById('buscadorSpinner');
+    const card     = document.getElementById('resultadoCard');
+    const lista    = document.getElementById('resultadoLista');
+
+    if (query.trim().length < 2) {
+        card.classList.remove('show');
+        spinner.classList.remove('show');
+        return;
+    }
+
+    spinner.classList.add('show');
+    card.classList.remove('show');
+
+    buscarTimeout = setTimeout(() => {
+        fetch('{{ route("reportes.buscar.lavado") }}?q=' + encodeURIComponent(query), {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            spinner.classList.remove('show');
+            card.classList.add('show');
+
+            if (!data.length) {
+                lista.innerHTML = `
+                    <div class="sin-resultados">
+                        <i class="bi bi-search" style="font-size:2rem;"></i>
+                        <p class="mt-2 mb-0">No se encontraron lavados con ese criterio</p>
+                    </div>`;
+                return;
+            }
+
+            lista.innerHTML = data.map(o => `
+                <div class="resultado-item">
+                    <div class="resultado-icon">🏍️</div>
+                    <div class="resultado-info">
+                        <div class="resultado-titulo">
+                            ${o.servicio} — ${o.cliente}
+                        </div>
+                        <div class="resultado-sub">
+                            👷 ${o.trabajador} &nbsp;|&nbsp;
+                            🏍️ ${o.moto} (${o.placa}) &nbsp;|&nbsp;
+                            📅 ${o.fecha} &nbsp;|&nbsp;
+                            💳 ${o.metodo_pago} &nbsp;|&nbsp;
+                            <span class="fw-semibold">${o.estado_pago}</span>
+                        </div>
+                    </div>
+                    <div class="resultado-precio">Bs. ${o.precio}</div>
+                </div>
+            `).join('');
+        })
+        .catch(() => {
+            spinner.classList.remove('show');
+            lista.innerHTML = `<div class="sin-resultados text-danger">Error al buscar. Intenta de nuevo.</div>`;
+            card.classList.add('show');
+        });
+    }, 350);
+}
+
+function limpiarBusqueda() {
+    document.getElementById('inputBuscar').value = '';
+    document.getElementById('resultadoCard').classList.remove('show');
+    document.getElementById('buscadorSpinner').classList.remove('show');
+    document.getElementById('resultadoLista').innerHTML = '';
+}
+
+// ── REGISTRO JM ──────────────────────────────────────────
 function toggleRegistroJM() {
     const panel = document.getElementById('panelRegistroJM');
     const btn   = document.getElementById('btnRegistroJM');
@@ -395,8 +611,9 @@ function badgeEstado(estado) {
 
 function exportar(tipo) {
     const urls = {
-        pdf:  '{{ url("/reportes/export/pdf") }}?periodo=' + periodoActual,
-        word: '{{ url("/reportes/export/word") }}?periodo=' + periodoActual,
+        pdf:   '{{ url("/reportes/export/pdf") }}?periodo='   + periodoActual,
+        excel: '{{ url("/reportes/export/excel") }}?periodo=' + periodoActual,
+        word:  '{{ url("/reportes/export/word") }}?periodo='  + periodoActual,
     };
     window.location.href = urls[tipo];
 }

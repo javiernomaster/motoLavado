@@ -137,6 +137,24 @@ class ReporteController extends Controller
         };
     }
 
+    public function buscarLavado(Request $request)
+{
+    $q = $request->get('q', '');
+
+    $ordenes = LavadoOrden::with(['cliente', 'moto', 'servicio', 'trabajador'])
+        ->whereHas('cliente',   fn($query) => $query->where('nombre', 'like', "%$q%"))
+        ->orWhereHas('moto',    fn($query) => $query->where('placa',  'like', "%$q%")
+                                                     ->orWhere('marca', 'like', "%$q%")
+                                                     ->orWhere('modelo','like', "%$q%"))
+        ->orWhereHas('trabajador', fn($query) => $query->where('nombre', 'like', "%$q%"))
+        ->orWhereHas('servicio',   fn($query) => $query->where('nombre', 'like', "%$q%"))
+        ->orderBy('fecha', 'desc')
+        ->limit(15)
+        ->get()
+        ->map(fn($o) => $this->formatOrden($o));
+
+    return response()->json($ordenes);
+}
     public function exportRegistrosPdf(Request $request)
     {
         $periodo = $request->get('periodo', 'dia');
@@ -235,20 +253,56 @@ class ReporteController extends Controller
         return view('reportes.mes', compact('trabajadores', 'inicio', 'fin'));
     }
 
-    public function porFecha()
+public function porFecha()
     {
         return view('reportes.fecha');
+    }
+
+    // Método AJAX para buscar por fecha específica
+    public function buscarFechaAjax(Request $request)
+    {
+        $request->validate(['fecha' => 'required|date']);
+        $fecha = Carbon::parse($request->fecha);
+        
+        $ordenes = LavadoOrden::whereDate('fecha', $fecha)
+            ->with(['cliente', 'moto', 'servicio', 'trabajador'])
+            ->orderBy('fecha', 'desc')
+            ->get();
+
+        $total = $ordenes->sum('precio_total');
+
+        return response()->json([
+            'ordenes' => $ordenes->map(fn($o) => [
+                'id_orden'    => $o->id_orden,
+                'cliente'     => $o->cliente?->nombre ?? '—',
+                'moto'        => $o->moto ? ($o->moto->marca . ' ' . $o->moto->modelo) : '—',
+                'placa'       => $o->moto?->placa ?? '—',
+                'trabajador'  => $o->trabajador?->nombre ?? '—',
+                'servicio'    => $o->servicio?->nombre ?? '—',
+                'precio'      => number_format($o->precio_total, 2),
+                'metodo_pago' => $o->metodo_pago ?? '—',
+                'estado_pago'=> $o->estado_pago ?? '—',
+                'hora'       => $o->fecha ? $o->fecha->format('H:i') : '—',
+            ]),
+            'total'   => number_format($total, 2),
+            'fecha'   => $fecha->locale('es')->isoFormat('dddd, D [de] MMMM YYYY'),
+            'count'   => $ordenes->count(),
+        ]);
     }
 
     public function buscarFecha(Request $request)
     {
         $request->validate(['fecha' => 'required|date']);
         $fecha = Carbon::parse($request->fecha);
-        $trabajadores = Trabajador::where('estado', 1)
-            ->withCount(['lavados as total_fecha' => fn($q) => $q->whereDate('fecha', $fecha)])
-            ->withSum(['lavados as ganancia_fecha' => fn($q) => $q->whereDate('fecha', $fecha)], 'precio_total')
+        
+        $ordenes = LavadoOrden::whereDate('fecha', $fecha)
+            ->with(['cliente', 'moto', 'servicio', 'trabajador'])
+            ->orderBy('fecha', 'desc')
             ->get();
-        return view('reportes.fecha', compact('trabajadores', 'fecha'));
+
+        $total = $ordenes->sum('precio_total');
+
+        return view('reportes.fecha', compact('ordenes', 'fecha', 'total'));
     }
 
     public function exportTrabajadoresExcel()

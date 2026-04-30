@@ -81,14 +81,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/reportes/semana', [ReporteController::class, 'semana'])->name('reportes.semana');
     Route::get('/reportes/mes',    [ReporteController::class, 'mes'])->name('reportes.mes');
 
-    // Por fecha
+// Por fecha
     Route::get('/reportes/fecha',  [ReporteController::class, 'porFecha'])->name('reportes.fecha');
     Route::post('/reportes/fecha', [ReporteController::class, 'buscarFecha'])->name('reportes.fecha.buscar');
+    Route::get('/reportes/fecha/buscar', [ReporteController::class, 'buscarFechaAjax'])->name('reportes.fecha.ajax');
 
     // Exportaciones antiguas
     Route::get('/reportes/trabajadores/excel', [ReporteController::class, 'exportTrabajadoresExcel'])->name('reportes.trabajadores.excel');
     Route::get('/reportes/trabajadores/pdf',   [ReporteController::class, 'exportTrabajadoresPdf'])->name('reportes.trabajadores.pdf');
 
+    Route::get('/reportes/buscar/lavado', [ReporteController::class, 'buscarLavado'])->name('reportes.buscar.lavado');
 });
 
 require __DIR__.'/auth.php';
