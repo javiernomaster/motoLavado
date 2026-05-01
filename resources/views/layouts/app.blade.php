@@ -100,10 +100,18 @@
         <i class="bi bi-truck"></i> Motos
     </a>
 
-    <!-- 🔥 REPORTES CORREGIDO -->
+<!-- 🔥 REPORTES CORREGIDO -->
     <a href="{{ route('reportes.index') }}">
         <i class="bi bi-bar-chart"></i> Reportes
     </a>
+
+    <!-- 🔥 CERRAR SESIÓN -->
+    <form action="{{ route('logout') }}" method="POST" class="mt-auto p-2">
+        @csrf
+        <button type="submit" class="btn btn-danger w-100 text-start">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        </button>
+    </form>
 
 </div>
 
